@@ -7,6 +7,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
+const compression = require('compression');
 
 const tourRouter = require('./starter/routes/tourRoutes');
 const userRouter = require('./starter/routes/userRoutes');
@@ -75,6 +76,8 @@ app.use(
     whitelist: ['duration', 'ratingsQuantity', 'ratingsAverage', 'maxGroupSize', 'difficulty', 'price'],
   }),
 );
+
+app.use(compression());
 
 //Test middleware
 app.use((req, res, next) => {

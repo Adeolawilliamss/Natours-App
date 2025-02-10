@@ -9,6 +9,7 @@ const factory = require('./handlerFactory');
 exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   // 1) Get the currently booked tour
   const tour = await Tour.findById(req.params.tourId);
+  // console.log(tour);
 
   // 2) Create the checkout session
   const session = await stripe.checkout.sessions.create({
@@ -80,7 +81,6 @@ exports.deleteBooking = factory.deleteOne(Booking);
 
 //Implement advanced authentication features:confirm user email,keep users logged in with refresh tokens,
 ///tw-factor auth etc.
-
 
 //CHALLENGES FOR THE WEBSITE!
 //Implement a signup form,similar to the login form
