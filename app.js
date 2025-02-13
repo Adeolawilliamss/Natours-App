@@ -10,13 +10,13 @@ const cookieParser = require('cookie-parser');
 const compression = require('compression');
 const cors = require('cors');
 
-const tourRouter = require('./starter/routes/tourRoutes');
-const userRouter = require('./starter/routes/userRoutes');
-const reviewRouter = require('./starter/routes/reviewRoutes');
-const bookingRouter = require('./starter/routes/bookingRoutes');
-const viewRouter = require('./starter/routes/viewRoutes');
-const AppError = require('./starter/utils/appError');
-const globalErrorHandler = require('./starter/controllers/errorController');
+const tourRouter = require('./routes/tourRoutes');
+const userRouter = require('./routes/userRoutes');
+const reviewRouter = require('./routes/reviewRoutes');
+const bookingRouter = require('./routes/bookingRoutes');
+const viewRouter = require('./routes/viewRoutes');
+const AppError = require('./utils/appError');
+const globalErrorHandler = require('./controllers/errorController');
 
 //Starts express App immediately
 const app = express();
@@ -24,7 +24,7 @@ const app = express();
 app.enable('trust proxy');
 
 app.set('view engine', 'pug');
-app.set('views', path.join(__dirname, 'starter/views'));
+app.set('views', path.join(__dirname, 'views'));
 
 //GLOBAL MIDDLEWARES:THESE ARE APPLIED TO ALL FILES
 //Implement CORS
@@ -40,7 +40,7 @@ app.use(cors());
 // app.options('*', cors());
 // app.options('api/v1/tours/id', cors());
 //Serving static files
-app.use(express.static(path.join(__dirname, 'starter/public')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 //Set security HTTP headers
 // app.use(helmet());
@@ -51,8 +51,16 @@ app.use(
       directives: {
         defaultSrc: ["'self'", 'https://unpkg.com'],
         connectSrc: ["'self'", 'ws://127.0.0.1:*'], // Allow WebSocket connections
-        scriptSrc: ["'self'", 'https://js.stripe.com', 'https://api.mapbox.com'],
-        styleSrc: ["'self'", 'https://fonts.googleapis.com', 'https://api.mapbox.com'],
+        scriptSrc: [
+          "'self'",
+          'https://js.stripe.com',
+          'https://api.mapbox.com',
+        ],
+        styleSrc: [
+          "'self'",
+          'https://fonts.googleapis.com',
+          'https://api.mapbox.com',
+        ],
         frameSrc: ["'self'", 'https://js.stripe.com'],
       },
     },
@@ -88,7 +96,14 @@ app.use(xss());
 //Prevent parameter pollution
 app.use(
   hpp({
-    whitelist: ['duration', 'ratingsQuantity', 'ratingsAverage', 'maxGroupSize', 'difficulty', 'price'],
+    whitelist: [
+      'duration',
+      'ratingsQuantity',
+      'ratingsAverage',
+      'maxGroupSize',
+      'difficulty',
+      'price',
+    ],
   }),
 );
 

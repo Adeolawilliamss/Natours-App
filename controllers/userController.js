@@ -7,7 +7,7 @@ const factory = require('./handlerFactory');
 
 // const multerStorage = multer.diskStorage({
 //   destination: (req, file, cb) => {
-//     cb(null, 'starter/public/img/users');
+//     cb(null, 'public/img/users');
 //   },
 //   filename: (req, file, cb) => {
 //     const ext = file.mimetype.split('/')[1];
@@ -41,7 +41,7 @@ exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
     .resize(500, 500)
     .toFormat('jpeg')
     .jpeg({ quality: 90 })
-    .toFile(`starter/public/img/users/${req.file.filename}`);
+    .toFile(`public/img/users/${req.file.filename}`);
 
   next();
 });
