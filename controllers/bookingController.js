@@ -3,7 +3,6 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Tour = require('../models/tourModel');
 const User = require('../models/userModel');
 const Booking = require('../models/bookingModel');
-const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 const factory = require('./handlerFactory');
 
@@ -103,8 +102,6 @@ exports.webhookCheckout = async (req, res, next) => {
   if (event.type === 'checkout.session.completed') {
     try {
       await createBookingCheckout(event.data.object);
-      console.log('Received Stripe Webhook Event:', event);
-      console.log('✅ Booking created successfully!');
     } catch (error) {
       console.error('❌ Error creating booking:', error);
     }
