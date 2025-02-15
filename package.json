@@ -21,6 +21,7 @@
     "compression": "^1.8.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
     "dotenv": "^16.4.7",
     "express": "^4.21.1",
     "express-mongo-sanitize": "^2.2.0",
@@ -44,7 +45,6 @@
     "xss-clean": "^0.1.4"
   },
   "devDependencies": {
-    "cross-env": "^7.0.3",
     "eslint": "^8.57.1",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-prettier": "^9.1.0",
