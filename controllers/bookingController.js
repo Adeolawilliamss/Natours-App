@@ -4,7 +4,18 @@ const Tour = require('../models/tourModel');
 const User = require('../models/userModel');
 const Booking = require('../models/bookingModel');
 const catchAsync = require('../utils/catchAsync');
+const AppError = require('../utils/appError');
 const factory = require('./handlerFactory');
+
+exports.setTourUserIDs = (req, res, next) => {
+  // If tourId is not in the body, get it from the URL
+  if (!req.body.tour) req.body.tour = req.params.tourId;
+
+  // If userId is not in the body, get it from the logged-in user
+  if (!req.body.user) req.body.user = req.user.id;
+
+  next();
+};
 
 exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   // 1) Get the currently booked tour
@@ -110,7 +121,52 @@ exports.webhookCheckout = async (req, res, next) => {
   res.status(200).json({ received: true });
 };
 
-exports.createBooking = factory.createOne(Booking);
+exports.createBooking = catchAsync(async (req, res, next) => {
+  const { tourId, userId, startDate } = req.body;
+
+  // Find the tour
+  const tour = await Tour.findById(tourId);
+  if (!tour) return next(new AppError('Tour not found', 404));
+
+  // Find the selected date
+  const tourDate = tour.startDates.find(
+    (entry) => entry.date.toISOString() === new Date(startDate).toISOString(),
+  );
+
+  if (!tourDate) return next(new AppError('Invalid tour date', 400));
+
+  // Check if the tour is sold out
+  if (tourDate.soldOut) {
+    return next(new AppError('This tour date is fully booked', 400));
+  }
+
+  // Increase participants
+  tourDate.participants += 1;
+
+  // Mark as sold out if maxGroupSize is exceeded
+  if (tourDate.participants >= tour.maxGroupSize) {
+    tourDate.soldOut = true;
+  }
+
+  // Save the updated tour
+  await tour.save();
+
+  // Create a new booking
+  const newBooking = await Booking.create({
+    tour: tourId,
+    user: userId,
+    startDate: new Date(startDate), // ✅ Ensure startDate is saved as a Date
+    price: tour.price,
+  });
+
+  res.status(201).json({
+    status: 'success',
+    data: {
+      booking: newBooking,
+    },
+  });
+});
+
 exports.getBooking = factory.getOne(Booking);
 exports.getAllBookings = factory.getAll(Booking);
 exports.updateBooking = factory.updateOne(Booking);
@@ -118,14 +174,14 @@ exports.deleteBooking = factory.deleteOne(Booking);
 
 //CHALLENGES FOR THE API!
 //Implement restriction that only users can review a tour that they have actually booked
-
 //Implement nested Booking routes:/tours/:id/bookings and users/:id/bookings
 //Getting all the bookings for a certain tour and getting all the booking for a certain user based on ids
-
 //improve tour dates:add a participants and soldOut field to each dates.And the dates then become like an
 //instance of a tour.Then when the user books,they need to select one of the dates.A new booking will increase
 //the number of participants in the date,until it is booked out(participants > maxGroupSize).So,when a user
 //wants to book,you need to check if tour on the salected date is available.
+
+//---------------------------------------------------------------------------------------
 
 //Implement advanced authentication features:confirm user email,keep users logged in with refresh tokens,
 ///tw-factor auth etc.

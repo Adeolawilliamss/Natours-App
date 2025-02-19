@@ -1,0 +1,17 @@
+extends base
+
+block content
+    main.main
+        .reviews-container
+            each review in reviews
+                if review.tour
+                    .review-card
+                        .review-header
+                            img.review-img(src=`/img/tours/${review.tour.imageCover}`, alt=`${review.tour.name}`)
+                            h3.review-tour-name= review.tour.name
+                        .review-body
+                            p.review-text= review.review
+                            p.review-rating
+                                span= `Rating: ${review.rating} ⭐`
+                else
+                    p No associated tour for this review.

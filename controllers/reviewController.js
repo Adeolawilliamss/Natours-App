@@ -1,6 +1,9 @@
 // const catchAsync = require('../utils/catchAsync');
 const Review = require('../models/reviewModel');
+const Booking = require('../models/bookingModel');
 const factory = require('./handlerFactory');
+const catchAsync = require('../utils/catchAsync');
+const AppError = require('../utils/appError');
 
 exports.setTourUserIDs = (req, res, next) => {
   //Allow nested routes
@@ -9,8 +12,34 @@ exports.setTourUserIDs = (req, res, next) => {
   next();
 };
 
+exports.createReview = catchAsync(async (req, res, next) => {
+  //Check if the user has a booking for the tour
+  const booking = await Booking.findOne({
+    user: req.user.id,
+    tour: req.body.tour,
+  });
+
+  if (!booking) {
+    return next(
+      new AppError('You can only review tours you have booked.', 403),
+    );
+  }
+  // If the user has booked the tour, proceed with creating the review
+  const review = await Review.create({
+    review: req.body.review,
+    rating: req.body.rating,
+    tour: req.body.tour,
+    user: req.user.id,
+  });
+
+  res.status(200).json({
+    data: {
+      review,
+    },
+  });
+});
+
 exports.getAllReviews = factory.getAll(Review);
 exports.getReview = factory.getOne(Review);
-exports.createReview = factory.createOne(Review);
 exports.updateReview = factory.updateOne(Review);
 exports.deleteReview = factory.deleteOne(Review);

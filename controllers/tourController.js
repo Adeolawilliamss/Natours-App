@@ -66,10 +66,69 @@ exports.aliasTopTour = (req, res, next) => {
   next();
 };
 
+exports.createTour = catchAsync(async (req, res, next) => {
+  if (req.body.startDates) {
+    req.body.startDates = req.body.startDates.map((date) => {
+      const participants =
+        date.participants !== undefined ? date.participants : 0;
+      let soldOut = date.soldOut !== undefined ? date.soldOut : false;
+
+      // If participants reach maxGroupSize, mark as sold out
+      if (req.body.maxGroupSize && participants >= req.body.maxGroupSize) {
+        soldOut = true;
+      }
+
+      return {
+        date: new Date(date.date || date), // Ensure it's a Date object
+        participants,
+        soldOut,
+      };
+    });
+  }
+
+  const newTour = await Tour.create(req.body);
+
+  res.status(201).json({
+    status: 'success',
+    data: {
+      tour: newTour,
+    },
+  });
+});
+
+// exports.createTour = catchAsync(async (req, res, next) => {
+//   if (req.body.startDates) {
+//     req.body.startDates = req.body.startDates.map((date) => {
+//       const participants =
+//         date.participants !== undefined ? date.participants : 1;
+//       let soldOut = date.soldOut !== undefined ? date.soldOut : false;
+
+//       // If participants reach maxGroupSize, mark as sold out
+//       if (req.body.maxGroupSize && participants >= req.body.maxGroupSize) {
+//         soldOut = true;
+//       }
+
+//       return {
+//         date: new Date(date.date || date),
+//         participants,
+//         soldOut,
+//       };
+//     });
+//   }
+
+//   const newTour = await Tour.create(req.body);
+
+//   res.status(201).json({
+//     status: 'success',
+//     data: {
+//       tour: newTour,
+//     },
+//   });
+// });
+
 exports.getAllTours = factory.getAll(Tour);
 
 exports.getTour = factory.getOne(Tour, { path: 'reviews' });
-exports.createTour = factory.createOne(Tour);
 exports.updateTour = factory.updateOne(Tour);
 exports.DeleteTour = factory.deleteOne(Tour);
 

@@ -1322,3 +1322,84 @@ body {
   -webkit-transform: translateY(-2px);
   transform: translateY(-2px);
 }
+
+
+/* Reviews Container */
+.reviews-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 25px;
+  max-width: 900px;
+  margin: 50px auto;
+  padding: 25px;
+}
+
+/* Review Card */
+.review-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  width: 100%;
+  max-width: 700px;
+  padding: 25px;
+  transition: transform 0.3s ease;
+}
+
+.review-card:hover {
+  transform: translateY(-6px);
+}
+
+/* Review Header */
+.review-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+/* Tour Image */
+.review-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 3px solid #ddd;
+}
+
+/* Tour Name */
+.review-tour-name {
+  font-size: 1.6rem; /* Larger title */
+  font-weight: bold;
+  color: #222;
+}
+
+/* Review Body */
+.review-body {
+  background: #f8f8f8;
+  padding: 18px;
+  border-radius: 10px;
+}
+
+.review-text {
+  font-size: 1.2rem; /* Larger text */
+  color: #444;
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
+
+/* Review Rating */
+.review-rating {
+  font-size: 1.3rem; /* Slightly larger */
+  font-weight: bold;
+  color: #ff9800;
+}
+
+/* No Tour Message */
+p.no-tour {
+  text-align: center;
+  font-size: 1.2rem;
+  color: red;
+  font-style: italic;
+}

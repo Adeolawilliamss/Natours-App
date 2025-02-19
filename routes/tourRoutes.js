@@ -2,6 +2,7 @@ const express = require('express');
 const tourController = require('../controllers/tourController');
 const authController = require('../controllers/authController');
 const reviewRouter = require('./reviewRoutes');
+const bookingRouter = require('./bookingRoutes');
 
 const router = express.Router();
 
@@ -11,6 +12,7 @@ const router = express.Router();
 //GET/tour/44647833/reviews
 
 router.use('/:tourId/reviews', reviewRouter);
+router.use('/:tourId/bookings', bookingRouter); // This forwards the tourId to bookingRoutes
 
 router
   .route('/top-5-tours')

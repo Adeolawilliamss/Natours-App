@@ -1,8 +1,10 @@
 const Tour = require('../models/tourModel');
 const User = require('../models/userModel');
 const Booking = require('../models/bookingModel');
+const Review = require('../models/reviewModel');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
+const factory = require('./handlerFactory');
 
 exports.alerts = (req, res, next) => {
   const { alert } = req.query;
@@ -22,7 +24,7 @@ exports.getOverview = catchAsync(async (req, res, next) => {
 });
 
 exports.getTour = catchAsync(async (req, res, next) => {
-  //1}Get the data for the requested tour (including reviews and guides)
+  console.log('Fetching tour details for:', req.params.slug);
   const tour = await Tour.findOne({ slug: req.params.slug }).populate({
     path: 'reviews',
     fields: 'review rating user',
@@ -30,6 +32,7 @@ exports.getTour = catchAsync(async (req, res, next) => {
   if (!tour) {
     return next(new AppError('There is no tour with that name.', 404));
   }
+  console.log('Start Dates:', tour.startDates);
   res.status(200).render('tour', {
     title: `${tour.name} Tour`,
     tour,
@@ -62,6 +65,23 @@ exports.getMyTours = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.getMyReviews = catchAsync(async (req, res, next) => {
+  //Find all reviews
+  const reviews = await Review.find({ user: req.user.id }).populate({
+    path: 'tour',
+    select: 'name imageCover', // Include only necessary tour
+  });
+
+  // Filter out reviews where tour is null
+  const validReviews = reviews.filter((review) => review.tour !== null);
+
+  //Render the Reviews Page
+  res.status(200).render('reviews', {
+    title: 'My Reviews',
+    reviews: validReviews, // Only send valid reviews
+  });
+});
+
 exports.updateUserData = catchAsync(async (req, res, next) => {
   const updatedUser = await User.findByIdAndUpdate(
     req.user.id,
@@ -79,3 +99,5 @@ exports.updateUserData = catchAsync(async (req, res, next) => {
     user: updatedUser,
   });
 });
+
+exports.deleteAllBookings = factory.deleteOne(Booking);
