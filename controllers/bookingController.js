@@ -184,7 +184,7 @@ exports.deleteBooking = factory.deleteOne(Booking);
 //---------------------------------------------------------------------------------------
 
 //Implement advanced authentication features:confirm user email,keep users logged in with refresh tokens,
-///tw-factor auth etc.
+///two-factor auth etc.
 
 //CHALLENGES FOR THE WEBSITE!
 //Implement a signup form,similar to the login form

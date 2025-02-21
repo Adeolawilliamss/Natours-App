@@ -6,31 +6,40 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const Email = require('../utils/email');
 
-const signToken = (id) =>
+const signAccessToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 
-const createSendToken = (user, statusCode, req, res) => {
-  const token = signToken(user._id);
+const signRefreshToken = (id) =>
+  jwt.sign({ id }, process.env.JWT_REFRESH_SECRET, {
+    expiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
+  });
 
-  res.cookie('jwt', token, {
-    expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
-    ),
+const createSendToken = (user, statusCode, req, res) => {
+  const accessToken = signAccessToken(user._id);
+  const refreshToken = signRefreshToken(user._id);
+
+  // Set access token in response
+  res.cookie('jwt', accessToken, {
+    expires: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes
     httpOnly: true,
     secure: req.secure || req.get('x-forwarded-proto') === 'https',
   });
 
-  //That should remove password from the output
-  user.password = undefined;
+  // Set refresh token in a separate cookie
+  res.cookie('refreshToken', refreshToken, {
+    expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+    httpOnly: true,
+    secure: req.secure || req.get('x-forwarded-proto') === 'https',
+  });
+
+  user.password = undefined; // Hide password in response
 
   res.status(statusCode).json({
     status: 'success',
-    token, // Return the token
-    data: {
-      user, // Return user data if needed
-    },
+    accessToken, // Send access token to client
+    data: { user },
   });
 };
 
@@ -39,7 +48,10 @@ exports.logOut = (req, res) => {
     expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true,
   });
-  res.status(200).json({ status: 'success' });
+
+  res.clearCookie('refreshToken'); // Properly clear refresh token
+
+  res.status(200).json({ status: 'success', message: 'Logged out' });
 };
 
 //Use the catchAync function so as not to write the try/catch block for every asynchronous function
