@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const Tour = require('../models/tourModel');
 const User = require('../models/userModel');
 const Booking = require('../models/bookingModel');
@@ -50,6 +51,32 @@ exports.getAccount = (req, res) => {
     title: 'Your Account',
   });
 };
+
+exports.verifyEmail = catchAsync(async (req, res) => {
+  // Hash token (because we saved the hashed version in DB)
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(req.params.token)
+    .digest('hex');
+
+  // Find user with this token
+  const user = await User.findOne({ verificationToken: hashedToken });
+
+  if (!user) {
+    return res
+      .status(400)
+      .json({ status: 'fail', message: 'Token is invalid or has expired' });
+  }
+
+  // Mark email as verified
+  user.emailVerified = true;
+  user.verificationToken = undefined; // Remove token after verification
+  await user.save({ validateBeforeSave: false });
+
+  res.status(200).render('verifyEmail', {
+    title: 'Email has been verified',
+  });
+});
 
 exports.getMyTours = catchAsync(async (req, res, next) => {
   //1}Find all bookings

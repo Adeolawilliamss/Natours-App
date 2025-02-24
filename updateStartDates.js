@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const Tour = require('./models/tourModel'); // Adjust the path as needed
+const User = require('./models/userModel'); // Adjust the path as needed
 
 dotenv.config({ path: './config.env' });
 
@@ -19,26 +19,15 @@ mongoose
 
 const updateStartDates = async () => {
   try {
-    const result = await Tour.updateMany(
-      {},
-      {
-        $set: {
-          startDates: [
-            { date: new Date('2025-06-01') },
-            { date: new Date('2025-07-15') },
-          ],
-        },
-      },
+    const result = await User.updateMany(
+      { emailVerified: { $exists: false } }, // Only update users missing the field
+      { $set: { emailVerified: true } }, // Mark existing users as verified
     );
 
-    if (result.modifiedCount > 0) {
-      console.log(`✅ Successfully updated ${result.modifiedCount} tours.`);
-    } else {
-      console.log('⚠️ No tours were updated.');
-    }
+    console.log(`${result.modifiedCount} users updated.`);
+    mongoose.connection.close();
   } catch (err) {
-    console.error('❌ Error updating startDates:', err);
-  } finally {
+    console.error('Error updating users:', err);
     mongoose.connection.close();
   }
 };
