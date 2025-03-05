@@ -1,0 +1,13 @@
+extends base
+
+block content
+    main.main
+        .login-form
+            h2.heading-secondary.ma-bt-lg Enter OTP
+            form.form.otp--login(action="/verify-otp" method="POST")
+                h1 Verify Your OTP
+                label(for="otp") Enter OTP:
+                input#otp(type="text" name="otp" required)
+                button(type="submit").btn.btn--green Submit OTP
+            p Didn't receive a code? 
+                a(href="/resend-otp") Resend OTP

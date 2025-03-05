@@ -73,6 +73,8 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
+app.set('trust proxy', 1); // ✅ Trust only 1 proxy layer (Heroku, Vercel, etc.)
+
 //Limit requests from same API
 const limiter = rateLimit({
   max: 100,

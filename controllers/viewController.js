@@ -46,6 +46,11 @@ exports.getLoginForm = (req, res) => {
   });
 };
 
+exports.getOtpPage = (req, res, next) => {
+  console.log('getOtpPage middleware hit');
+  res.render('otp'); // This sends a response, stopping further execution!
+};
+
 exports.getAccount = (req, res) => {
   res.status(200).render('account', {
     title: 'Your Account',
@@ -73,7 +78,7 @@ exports.verifyEmail = catchAsync(async (req, res) => {
   user.verificationToken = undefined; // Remove token after verification
   await user.save({ validateBeforeSave: false });
 
-  res.status(200).render('verifyEmail', {
+  res.status(200).render('successEmail', {
     title: 'Email has been verified',
   });
 });

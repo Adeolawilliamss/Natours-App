@@ -56,6 +56,7 @@ exports.refreshToken = catchAsync(async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+    console.log('Decoded JWT:', decoded); // Debugging
 
     const user = await User.findById(decoded.id);
     if (!user) {
@@ -169,15 +170,48 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   }
 });
 
+// exports.login = catchAsync(async (req, res, next) => {
+//   const { email, password } = req.body;
+
+//   //1} Check if email and password exists
+//   if (!email || !password) {
+//     return next(new AppError('Please provide email and password!', 400));
+//   }
+
+//   //2}Check if user exists and if the password is correct
+//   const user = await User.findOne({ email }).select('+password');
+
+//   if (!user || !(await user.correctPassword(password, user.password))) {
+//     return next(new AppError('Incorrect email or password', 401));
+//   }
+
+//   // Check if user verified email
+//   if (!user.emailVerified) {
+//     return res.status(403).json({
+//       status: 'fail',
+//       message: 'Please verify your email before logging in',
+//     });
+//   }
+
+//   // 4️⃣ Check if OTP has been verified
+//   if (!user.otpVerified) {
+//     return res.status(403).json({
+//       status: 'fail',
+//       message: 'Please verify your OTP before logging in',
+//     });
+//   }
+
+//   //3}If everything is okay,send token to client
+//   createSendToken(user, 200, req, res);
+// });
+
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
 
-  //1} Check if email and password exists
   if (!email || !password) {
     return next(new AppError('Please provide email and password!', 400));
   }
 
-  //2}Check if user exists and if the password is correct
   const user = await User.findOne({ email }).select('+password');
 
   if (!user || !(await user.correctPassword(password, user.password))) {
@@ -191,11 +225,37 @@ exports.login = catchAsync(async (req, res, next) => {
       message: 'Please verify your email before logging in',
     });
   }
-  //3}If everything is okay,send token to client
-  createSendToken(user, 200, req, res);
+
+  // Generate a 6-digit OTP
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  user.otp = crypto.createHash('sha256').update(otp).digest('hex'); // Hash OTP for security
+  user.otpExpires = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
+  await user.save({ validateBeforeSave: false });
+
+  // Send OTP to user's email
+  try {
+    await new Email(user, null, otp).sendOTP();
+    console.log('Rendering OTP Page...'); // ✅ Debugging Log
+
+    // ✅ Redirect to the OTP page instead of rendering directly
+    return res.status(200).json({
+      status: 'success',
+      message: 'OTP sent successfully!',
+      email: user.email,
+      redirectUrl: `/otp?email=${user.email}`,
+    });
+  } catch (err) {
+    user.otp = undefined;
+    user.otpExpires = undefined;
+    await user.save({ validateBeforeSave: false });
+    console.log('Redirecting to OTP page:', `/otp?email=${user.email}`);
+
+    return next(new AppError('Error sending OTP. Try again later.', 500));
+  }
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
+  console.log('🔍 Protect Middleware Triggered on:', req.path); // Debugging
   //1}Getting token and checking if its there
   let token;
   if (
@@ -221,6 +281,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   //3}Check if user still exists
   const currentUser = await User.findById(decoded.id);
+  console.log('Current User:', currentUser);
   if (!currentUser) {
     return next(
       new AppError('The user belonging to this token no longer exists', 401),
@@ -320,5 +381,54 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   user.passwordConfirm = req.body.passwordConfirm;
   await user.save();
   //4}Log the user in,send JWT
+  createSendToken(user, 200, req, res);
+});
+
+exports.requestOTP = catchAsync(async (req, res, next) => {
+  const user = await User.findOne({ email: req.body.email });
+
+  if (!user) return next(new AppError('User not found', 404));
+
+  // Generate OTP using the method in userModel
+  const otp = user.createOTP();
+  await user.save({ validateBeforeSave: false });
+
+  // Send OTP via email
+  await new Email(user, null, otp).sendOTP();
+
+  res.status(200).json({
+    status: 'success',
+    message: 'OTP sent to email!',
+  });
+});
+
+exports.verifyOTP = catchAsync(async (req, res, next) => {
+  const { email, otp } = req.body;
+  const user = await User.findOne({ email });
+
+  if (!user) return next(new AppError('User not found', 404));
+
+  if (!user.otp || user.otpExpires < Date.now()) {
+    return next(new AppError('OTP expired. Request a new one.', 400));
+  }
+
+  const hashedotp = crypto.createHash('sha256').update(otp).digest('hex');
+
+  if (user.otp !== hashedotp) {
+    return next(new AppError('Invalid OTP. Please try again.', 400));
+  }
+
+  // Mark OTP as verified
+  user.otpVerified = true;
+  user.otp = undefined; // Clear OTP after verification
+  user.otpExpires = undefined;
+  await user.save({ validateBeforeSave: false });
+
+  // res.status(200).json({
+  //   status: 'success',
+  //   message: 'OTP verified successfully!',
+  // });
+
+  //If everythings okay,send token to client
   createSendToken(user, 200, req, res);
 });

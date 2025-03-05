@@ -43,6 +43,12 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false, // User starts as unverified
   },
+  otp: String,
+  otpExpires: Date,
+  otpVerified: {
+    type: Boolean,
+    default: false,
+  },
   verificationToken: String, // Stores the verification token
   passwordChangedAt: Date,
   passwordResetToken: String,
@@ -122,6 +128,14 @@ userSchema.methods.createEmailVerificationToken = function () {
     .digest('hex');
 
   return verificationToken; // Return unhashed token for email link
+};
+
+// Generate OTP
+userSchema.methods.createOTP = function () {
+  const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
+  this.otp = otp;
+  this.otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes expiry
+  return otp;
 };
 
 const User = mongoose.model('User', userSchema);

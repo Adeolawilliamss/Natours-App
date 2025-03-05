@@ -1,6 +1,7 @@
 const express = require('express');
 const userController = require('../controllers/userController');
 const authController = require('../controllers/authController');
+const viewController = require('../controllers/viewController');
 const bookingRouter = require('./bookingRoutes');
 
 //SUB MIDDLEWARE FOR THIS MINI-APPLICATION
@@ -11,6 +12,7 @@ router.use('/:userId/bookings', bookingRouter); // This forwards the userId to b
 router.post('/signup', authController.signUp);
 router.post('/verifyEmail/:token', authController.verifyEmail);
 router.post('/login', authController.login);
+router.post('/verify-otp', authController.verifyOTP);
 router.get('/logout', authController.logOut);
 router.post('/forgotPassword', authController.forgotPassword);
 router.patch('/resetPassword/:token', authController.resetPassword);

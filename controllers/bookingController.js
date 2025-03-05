@@ -171,20 +171,7 @@ exports.getBooking = factory.getOne(Booking);
 exports.getAllBookings = factory.getAll(Booking);
 exports.updateBooking = factory.updateOne(Booking);
 exports.deleteBooking = factory.deleteOne(Booking);
-
-//CHALLENGES FOR THE API!
-//Implement restriction that only users can review a tour that they have actually booked
-//Implement nested Booking routes:/tours/:id/bookings and users/:id/bookings
-//Getting all the bookings for a certain tour and getting all the booking for a certain user based on ids
-//improve tour dates:add a participants and soldOut field to each dates.And the dates then become like an
-//instance of a tour.Then when the user books,they need to select one of the dates.A new booking will increase
-//the number of participants in the date,until it is booked out(participants > maxGroupSize).So,when a user
-//wants to book,you need to check if tour on the salected date is available.
-
 //---------------------------------------------------------------------------------------
-
-//Implement advanced authentication features:confirm user email,keep users logged in with refresh tokens,
-///two-factor auth etc.
 
 //CHALLENGES FOR THE WEBSITE!
 //Implement a signup form,similar to the login form

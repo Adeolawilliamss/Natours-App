@@ -2,6 +2,7 @@
 import '@babel/polyfill';
 import { displayMap } from './map';
 import { login, logout } from './login';
+import { verifyOtp } from './otp';
 import { updateSettings } from './updateSettings';
 import { bookTour } from './stripe';
 import { showAlert } from './alerts'
@@ -9,6 +10,7 @@ import { showAlert } from './alerts'
 //DOM ELEMENTS
 const mapBox = document.getElementById('map');
 const logInForm = document.querySelector('.form--login');
+const otpInForm = document.querySelector('.otp--login')
 const logOutBtn = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
@@ -30,6 +32,14 @@ if (logInForm) {
 }
 
 if (logOutBtn) logOutBtn.addEventListener('click', logout);
+
+
+otpInForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const otp = document.getElementById('otp').value;
+  console.log('OTP Submitted:', otp);
+  verifyOtp(otp); // Call verifyOtp function
+});
 
 if (userDataForm)
   userDataForm.addEventListener('submit', (e) => {
