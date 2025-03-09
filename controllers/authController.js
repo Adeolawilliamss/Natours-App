@@ -93,22 +93,73 @@ exports.logOut = (req, res) => {
 };
 
 //Use the catchAync function so as not to write the try/catch block for every asynchronous function
+// exports.signUp = catchAsync(async (req, res, next) => {
+//   console.log('Signup request received:', req.body); // ✅ Debugging log
+
+//   const newUser = await User.create(req.body);
+//   console.log('New user created:', newUser); // ✅ Debugging log
+
+//   //If everythings okay,send token to client
+//   createSendToken(newUser, 200, req, res);
+
+//   // Generate email verification token
+//   const verificationToken = newUser.createEmailVerificationToken();
+//   await newUser.save({ validateBeforeSave: false });
+
+//   // Send verification email
+//   const verificationURL = `${req.protocol}://${req.get(
+//     'host',
+//   )}/user/verifyEmail/${verificationToken}`;
+
+//   try {
+//     await new Email(newUser, verificationURL).sendVerificationEmail();
+//     console.log('Rendering signup confirm page...');
+
+//     return res.status(201).json({
+//       status: 'success',
+//       message: 'Signup successful! Check your email for verification.',
+//       redirectUrl: `/confirmSignup`,
+//     });
+//   } catch (error) {
+//     console.log('Error sending verification email:', error); // ✅ Debugging log
+
+//     newUser.verificationToken = undefined;
+//     newUser.verificationURL = undefined;
+//     await newUser.save({ validateBeforeSave: false });
+
+//     return next(new AppError('Error sending OTP. Try again later.', 500));
+//   }
+// });
+
 exports.signUp = catchAsync(async (req, res, next) => {
   const newUser = await User.create(req.body);
 
-  //Generate email verification token
-  const verificationToken = newUser.createEmailVerificationToken();
-  await newUser.save({ validateBeforeSave: false });
+  // Send login response first
+  createSendToken(newUser, 200, req, res);
 
-  //Send verification email
-  const verificationURL = `${req.protocol}://${req.get(
-    'host',
-  )}/user/verifyEmail/${verificationToken}`;
+  process.nextTick(async () => {
+    try {
+      const verificationToken = newUser.createEmailVerificationToken();
 
-  await new Email(newUser, verificationURL).sendVerificationEmail();
-  res.status(201).json({
-    status: 'success',
-    message: 'Signup successful! Check your email for verification.',
+      // ✅ Update the verification token WITHOUT saving the user (avoiding password hashing issue)
+      await User.findByIdAndUpdate(newUser._id, {
+        verificationToken: newUser.verificationToken,
+      });
+
+      console.log('User verification token updated in DB');
+
+      // Send verification email
+      const verificationURL = `${req.protocol}://${req.get(
+        'host',
+      )}/user/verifyEmail/${verificationToken}`;
+
+      await new Email(newUser, verificationURL).sendVerificationEmail();
+    } catch (error) {
+      console.log('Error sending verification email:', error);
+      await User.findByIdAndUpdate(newUser._id, {
+        verificationToken: undefined,
+      });
+    }
   });
 });
 
@@ -133,10 +184,7 @@ exports.verifyEmail = catchAsync(async (req, res, next) => {
   user.verificationToken = undefined; // Remove token after verification
   await user.save({ validateBeforeSave: false });
 
-  res.status(200).json({
-    status: 'success',
-    message: 'Your email has been verified! You can now log in.',
-  });
+  createSendToken(user, 200, req, res);
 });
 
 exports.forgotPassword = catchAsync(async (req, res, next) => {
@@ -170,41 +218,6 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   }
 });
 
-// exports.login = catchAsync(async (req, res, next) => {
-//   const { email, password } = req.body;
-
-//   //1} Check if email and password exists
-//   if (!email || !password) {
-//     return next(new AppError('Please provide email and password!', 400));
-//   }
-
-//   //2}Check if user exists and if the password is correct
-//   const user = await User.findOne({ email }).select('+password');
-
-//   if (!user || !(await user.correctPassword(password, user.password))) {
-//     return next(new AppError('Incorrect email or password', 401));
-//   }
-
-//   // Check if user verified email
-//   if (!user.emailVerified) {
-//     return res.status(403).json({
-//       status: 'fail',
-//       message: 'Please verify your email before logging in',
-//     });
-//   }
-
-//   // 4️⃣ Check if OTP has been verified
-//   if (!user.otpVerified) {
-//     return res.status(403).json({
-//       status: 'fail',
-//       message: 'Please verify your OTP before logging in',
-//     });
-//   }
-
-//   //3}If everything is okay,send token to client
-//   createSendToken(user, 200, req, res);
-// });
-
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
 
@@ -226,10 +239,8 @@ exports.login = catchAsync(async (req, res, next) => {
     });
   }
 
-  // Generate a 6-digit OTP
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  user.otp = crypto.createHash('sha256').update(otp).digest('hex'); // Hash OTP for security
-  user.otpExpires = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
+  // Generate OTP using the method from the user model
+  const otp = user.createOTP();
   await user.save({ validateBeforeSave: false });
 
   // Send OTP to user's email
@@ -384,24 +395,6 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   createSendToken(user, 200, req, res);
 });
 
-exports.requestOTP = catchAsync(async (req, res, next) => {
-  const user = await User.findOne({ email: req.body.email });
-
-  if (!user) return next(new AppError('User not found', 404));
-
-  // Generate OTP using the method in userModel
-  const otp = user.createOTP();
-  await user.save({ validateBeforeSave: false });
-
-  // Send OTP via email
-  await new Email(user, null, otp).sendOTP();
-
-  res.status(200).json({
-    status: 'success',
-    message: 'OTP sent to email!',
-  });
-});
-
 exports.verifyOTP = catchAsync(async (req, res, next) => {
   const { email, otp } = req.body;
   const user = await User.findOne({ email });
@@ -424,11 +417,88 @@ exports.verifyOTP = catchAsync(async (req, res, next) => {
   user.otpExpires = undefined;
   await user.save({ validateBeforeSave: false });
 
-  // res.status(200).json({
-  //   status: 'success',
-  //   message: 'OTP verified successfully!',
-  // });
-
   //If everythings okay,send token to client
   createSendToken(user, 200, req, res);
 });
+
+//Use the catchAync function so as not to write the try/catch block for every asynchronous function
+// exports.signUp = catchAsync(async (req, res, next) => {
+//   const newUser = await User.create(req.body);
+
+//   //Generate email verification token
+//   const verificationToken = newUser.createEmailVerificationToken();
+//   await newUser.save({ validateBeforeSave: false });
+
+//   //Send verification email
+//   const verificationURL = `${req.protocol}://${req.get(
+//     'host',
+//   )}/user/verifyEmail/${verificationToken}`;
+
+//   await new Email(newUser, verificationURL).sendVerificationEmail();
+//   res.status(201).json({
+//     status: 'success',
+//     message: 'Signup successful! Check your email for verification.',
+//   });
+// });
+
+// exports.verifyEmail = catchAsync(async (req, res, next) => {
+//   // Hash token (because we saved the hashed version in DB)
+//   const hashedToken = crypto
+//     .createHash('sha256')
+//     .update(req.params.token)
+//     .digest('hex');
+
+//   // Find user with this token
+//   const user = await User.findOne({ verificationToken: hashedToken });
+
+//   if (!user) {
+//     return res
+//       .status(400)
+//       .json({ status: 'fail', message: 'Token is invalid or has expired' });
+//   }
+
+//   // Mark email as verified
+//   user.emailVerified = true;
+//   user.verificationToken = undefined; // Remove token after verification
+//   await user.save({ validateBeforeSave: false });
+
+//   res.status(200).json({
+//     status: 'success',
+//     message: 'Your email has been verified! You can now log in.',
+//   });
+// });
+
+// exports.login = catchAsync(async (req, res, next) => {
+//   const { email, password } = req.body;
+
+//   //1} Check if email and password exists
+//   if (!email || !password) {
+//     return next(new AppError('Please provide email and password!', 400));
+//   }
+
+//   //2}Check if user exists and if the password is correct
+//   const user = await User.findOne({ email }).select('+password');
+
+//   if (!user || !(await user.correctPassword(password, user.password))) {
+//     return next(new AppError('Incorrect email or password', 401));
+//   }
+
+//   // Check if user verified email
+//   if (!user.emailVerified) {
+//     return res.status(403).json({
+//       status: 'fail',
+//       message: 'Please verify your email before logging in',
+//     });
+//   }
+
+//   // 4️⃣ Check if OTP has been verified
+//   if (!user.otpVerified) {
+//     return res.status(403).json({
+//       status: 'fail',
+//       message: 'Please verify your OTP before logging in',
+//     });
+//   }
+
+//   //3}If everything is okay,send token to client
+//   createSendToken(user, 200, req, res);
+// });

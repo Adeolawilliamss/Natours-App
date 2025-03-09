@@ -1,7 +1,6 @@
 const express = require('express');
 const userController = require('../controllers/userController');
 const authController = require('../controllers/authController');
-const viewController = require('../controllers/viewController');
 const bookingRouter = require('./bookingRoutes');
 
 //SUB MIDDLEWARE FOR THIS MINI-APPLICATION

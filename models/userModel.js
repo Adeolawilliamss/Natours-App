@@ -132,10 +132,10 @@ userSchema.methods.createEmailVerificationToken = function () {
 
 // Generate OTP
 userSchema.methods.createOTP = function () {
-  const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
-  this.otp = otp;
+  const otp = Math.floor(100000 + Math.random() * 900000).toString(); // Generate OTP
+  this.otp = crypto.createHash('sha256').update(otp).digest('hex'); // Hash OTP for security
   this.otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes expiry
-  return otp;
+  return otp; // Return plain OTP for sending via email
 };
 
 const User = mongoose.model('User', userSchema);

@@ -2,25 +2,21 @@
 import '@babel/polyfill';
 import { displayMap } from './map';
 import { login, logout } from './login';
+import { signup } from './signup';
 import { verifyOtp } from './otp';
 import { updateSettings } from './updateSettings';
 import { bookTour } from './stripe';
-import { showAlert } from './alerts'
+import { showAlert } from './alerts';
 
 //DOM ELEMENTS
-const mapBox = document.getElementById('map');
 const logInForm = document.querySelector('.form--login');
-const otpInForm = document.querySelector('.otp--login')
+const signupForm = document.getElementById('signup-form');
+const otpInForm = document.querySelector('.otp--login');
 const logOutBtn = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
 const bookBtn = document.getElementById('book-tour');
 
-//DELEGATION
-// if (mapBox) {
-//   const locations = JSON.parse(mapBox.dataset.locations);
-//   displayMap(locations);
-// }
 
 if (logInForm) {
   logInForm.addEventListener('submit', (e) => {
@@ -33,13 +29,38 @@ if (logInForm) {
 
 if (logOutBtn) logOutBtn.addEventListener('click', logout);
 
+if(otpInForm) {
+  otpInForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const otp = document.getElementById('otp').value;
+    console.log('OTP Submitted:', otp);
+    verifyOtp(otp); // Call verifyOtp function
+  });
+}
 
-otpInForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const otp = document.getElementById('otp').value;
-  console.log('OTP Submitted:', otp);
-  verifyOtp(otp); // Call verifyOtp function
-});
+if (signupForm) {
+  console.log('Signup form found!'); // ✅ Debugging log
+
+  signupForm.addEventListener('submit', (e) => {
+    e.preventDefault(); // Prevents form from reloading
+
+    console.log('Signup form submitted!'); // ✅ Debugging log
+
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const passwordConfirm = document.getElementById('passwordConfirm').value;
+
+    if (password !== passwordConfirm) {
+      alert('Passwords do not match!');
+      return;
+    }
+
+    signup(name, email, password, passwordConfirm);
+  });
+} else {
+  console.log('Signup form NOT found!'); // ✅ Debugging log
+}
 
 if (userDataForm)
   userDataForm.addEventListener('submit', (e) => {
@@ -86,5 +107,5 @@ if (bookBtn) {
   });
 }
 
-const alertMessage = document.querySelector('body').dataset.alert
-if(alertMessage) showAlert('success', alertMessage, 10)
+const alertMessage = document.querySelector('body').dataset.alert;
+if (alertMessage) showAlert('success', alertMessage, 10);

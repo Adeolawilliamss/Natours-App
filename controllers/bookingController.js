@@ -174,8 +174,6 @@ exports.deleteBooking = factory.deleteOne(Booking);
 //---------------------------------------------------------------------------------------
 
 //CHALLENGES FOR THE WEBSITE!
-//Implement a signup form,similar to the login form
-
 //On the tour detail page,if a user has taken a tour,allow them add a review directly on a website.Implement a form for this
 
 ///Hide the entire Booking section on thr tour detail page if current user hhas already booked the tour

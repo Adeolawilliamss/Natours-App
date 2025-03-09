@@ -1,0 +1,13 @@
+extends base
+
+block content
+    main.main
+        .login-form
+            h2.heading-secondary.ma-bt-lg Enter Verification Token
+            form.form.otp--login(action="/verifyEmail/:token" method="POST")
+                h1 Verify Your Token
+                label(for="signup") Enter Token:
+                input#token(type="text" name="token" required)
+                button(type="submit").btn.btn--green Submit Token
+            p Didn't receive a code? 
+                a(href="/resend-otp") Resend Token

@@ -46,9 +46,18 @@ exports.getLoginForm = (req, res) => {
   });
 };
 
+exports.getSignupForm = (req, res) => {
+  res.status(200).render('signup', {
+    title: 'Create your Account',
+  });
+};
+
 exports.getOtpPage = (req, res, next) => {
-  console.log('getOtpPage middleware hit');
-  res.render('otp'); // This sends a response, stopping further execution!
+  res.render('otp');
+};
+
+exports.getSignupPage = (req, res, next) => {
+  res.render('signupConfirm');
 };
 
 exports.getAccount = (req, res) => {
