@@ -68,6 +68,8 @@ block content
         #map(data-locations=JSON.stringify(tour.locations))
 
     section.section-reviews
+        .review_background
+            a(href=`/tour/${tour.slug}/LeaveReviews`) Click here to leave a review...
         .reviews
             each review in tour.reviews
                 +reviewCard(review)

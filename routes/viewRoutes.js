@@ -15,6 +15,11 @@ router.get(
 router.get('/user/verifyEmail/:token', viewController.verifyEmail);
 router.get('/tour/:slug', authController.isLoggedIn, viewController.getTour);
 router.get('/login', viewController.getLoginForm);
+router.get(
+  '/tour/:slug/LeaveReviews',
+  authController.isLoggedIn,
+  viewController.leaveReviews,
+);
 router.get('/signup', viewController.getSignupForm);
 router.get('/otp', viewController.getOtpPage);
 router.get('/confirmSignup', viewController.getSignupPage);

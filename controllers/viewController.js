@@ -40,6 +40,21 @@ exports.getTour = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.leaveReviews = catchAsync(async (req, res, next) => {
+  const tour = await Tour.findOne({ slug: req.params.slug });
+
+  if (!tour) {
+    return next(new AppError('There is no tour with that name.', 404));
+  }
+
+  console.log('Tour ID passed to template:', tour._id); // ✅ Debugging log
+
+  res.status(200).render('leaveReviews', {
+    title: 'Leave a Review',
+    tourId: tour._id, // Pass tour ID to the template
+  });
+});
+
 exports.getLoginForm = (req, res) => {
   res.status(200).render('login', {
     title: 'Log into your Account',

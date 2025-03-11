@@ -10,14 +10,13 @@ const router = express.Router({ mergeParams: true });
 
 router.use(authController.protect);
 
-router
-  .route('/')
-  .get(reviewController.getAllReviews)
-  .post(
-    authController.restrictTo('user'),
-    reviewController.setTourUserIDs,
-    reviewController.createReview,
-  );
+router.route('/').get(reviewController.getAllReviews);
+
+router.post(
+  '/sendReviews',
+  authController.protect,
+  reviewController.createReview,
+);
 
 router
   .route('/:id')

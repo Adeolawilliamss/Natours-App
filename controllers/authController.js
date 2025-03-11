@@ -25,7 +25,7 @@ const createSendToken = (user, statusCode, req, res) => {
 
   // Set access token in response
   res.cookie('jwt', accessToken, {
-    expires: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes
+    expires: new Date(Date.now() + 60 * 60 * 1000), // 60 minutes
     httpOnly: true,
     secure: req.secure || req.get('x-forwarded-proto') === 'https',
   });
@@ -91,45 +91,6 @@ exports.logOut = (req, res) => {
 
   res.status(200).json({ status: 'success', message: 'Logged out' });
 };
-
-//Use the catchAync function so as not to write the try/catch block for every asynchronous function
-// exports.signUp = catchAsync(async (req, res, next) => {
-//   console.log('Signup request received:', req.body); // ✅ Debugging log
-
-//   const newUser = await User.create(req.body);
-//   console.log('New user created:', newUser); // ✅ Debugging log
-
-//   //If everythings okay,send token to client
-//   createSendToken(newUser, 200, req, res);
-
-//   // Generate email verification token
-//   const verificationToken = newUser.createEmailVerificationToken();
-//   await newUser.save({ validateBeforeSave: false });
-
-//   // Send verification email
-//   const verificationURL = `${req.protocol}://${req.get(
-//     'host',
-//   )}/user/verifyEmail/${verificationToken}`;
-
-//   try {
-//     await new Email(newUser, verificationURL).sendVerificationEmail();
-//     console.log('Rendering signup confirm page...');
-
-//     return res.status(201).json({
-//       status: 'success',
-//       message: 'Signup successful! Check your email for verification.',
-//       redirectUrl: `/confirmSignup`,
-//     });
-//   } catch (error) {
-//     console.log('Error sending verification email:', error); // ✅ Debugging log
-
-//     newUser.verificationToken = undefined;
-//     newUser.verificationURL = undefined;
-//     await newUser.save({ validateBeforeSave: false });
-
-//     return next(new AppError('Error sending OTP. Try again later.', 500));
-//   }
-// });
 
 exports.signUp = catchAsync(async (req, res, next) => {
   const newUser = await User.create(req.body);
@@ -218,6 +179,53 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   }
 });
 
+// exports.login = catchAsync(async (req, res, next) => {
+//   const { email, password } = req.body;
+
+//   if (!email || !password) {
+//     return next(new AppError('Please provide email and password!', 400));
+//   }
+
+//   const user = await User.findOne({ email }).select('+password');
+
+//   if (!user || !(await user.correctPassword(password, user.password))) {
+//     return next(new AppError('Incorrect email or password', 401));
+//   }
+
+//   // Check if user verified email
+//   if (!user.emailVerified) {
+//     return res.status(403).json({
+//       status: 'fail',
+//       message: 'Please verify your email before logging in',
+//     });
+//   }
+
+//   // Generate OTP using the method from the user model
+//   const otp = user.createOTP();
+//   await user.save({ validateBeforeSave: false });
+
+//   // Send OTP to user's email
+//   try {
+//     await new Email(user, null, otp).sendOTP();
+//     console.log('Rendering OTP Page...'); // ✅ Debugging Log
+
+//     // ✅ Redirect to the OTP page instead of rendering directly
+//     return res.status(200).json({
+//       status: 'success',
+//       message: 'OTP sent successfully!',
+//       email: user.email,
+//       redirectUrl: `/otp?email=${user.email}`,
+//     });
+//   } catch (err) {
+//     user.otp = undefined;
+//     user.otpExpires = undefined;
+//     await user.save({ validateBeforeSave: false });
+//     console.log('Redirecting to OTP page:', `/otp?email=${user.email}`);
+
+//     return next(new AppError('Error sending OTP. Try again later.', 500));
+//   }
+// });
+
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
 
@@ -239,30 +247,7 @@ exports.login = catchAsync(async (req, res, next) => {
     });
   }
 
-  // Generate OTP using the method from the user model
-  const otp = user.createOTP();
-  await user.save({ validateBeforeSave: false });
-
-  // Send OTP to user's email
-  try {
-    await new Email(user, null, otp).sendOTP();
-    console.log('Rendering OTP Page...'); // ✅ Debugging Log
-
-    // ✅ Redirect to the OTP page instead of rendering directly
-    return res.status(200).json({
-      status: 'success',
-      message: 'OTP sent successfully!',
-      email: user.email,
-      redirectUrl: `/otp?email=${user.email}`,
-    });
-  } catch (err) {
-    user.otp = undefined;
-    user.otpExpires = undefined;
-    await user.save({ validateBeforeSave: false });
-    console.log('Redirecting to OTP page:', `/otp?email=${user.email}`);
-
-    return next(new AppError('Error sending OTP. Try again later.', 500));
-  }
+  createSendToken(user, 200, req, res);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {

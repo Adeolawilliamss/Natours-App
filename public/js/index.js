@@ -1,8 +1,8 @@
 /* eslint-disable */
 import '@babel/polyfill';
-import { displayMap } from './map';
 import { login, logout } from './login';
 import { signup } from './signup';
+import { reviews } from './reviews';
 import { verifyOtp } from './otp';
 import { updateSettings } from './updateSettings';
 import { bookTour } from './stripe';
@@ -11,6 +11,7 @@ import { showAlert } from './alerts';
 //DOM ELEMENTS
 const logInForm = document.querySelector('.form--login');
 const signupForm = document.getElementById('signup-form');
+const reviewForm = document.getElementById('review-form');
 const otpInForm = document.querySelector('.otp--login');
 const logOutBtn = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
@@ -60,6 +61,21 @@ if (signupForm) {
   });
 } else {
   console.log('Signup form NOT found!'); // ✅ Debugging log
+}
+
+if (reviewForm) {
+  reviewForm.addEventListener('submit', (e) => {
+    e.preventDefault(); // Prevents form from reloading
+
+    console.log('Review form submitted!'); // ✅ Debugging log
+    const rating = document.getElementById('rating').value;
+    const review = document.getElementById('review').value;
+    const tour = document.getElementById('tour').value;
+
+    reviews(rating, review, tour);
+  });
+} else {
+  console.log('Review form NOT found!'); // ✅ Debugging log
 }
 
 if (userDataForm)

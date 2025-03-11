@@ -13,7 +13,7 @@ exports.setTourUserIDs = (req, res, next) => {
 };
 
 exports.createReview = catchAsync(async (req, res, next) => {
-  //Check if the user has a booking for the tour
+  // Check if the user has a booking for the tour
   const booking = await Booking.findOne({
     user: req.user.id,
     tour: req.body.tour,
@@ -24,7 +24,18 @@ exports.createReview = catchAsync(async (req, res, next) => {
       new AppError('You can only review tours you have booked.', 403),
     );
   }
-  // If the user has booked the tour, proceed with creating the review
+
+  // Check if the user has already reviewed this tour
+  const existingReview = await Review.findOne({
+    user: req.user.id,
+    tour: req.body.tour,
+  });
+
+  if (existingReview) {
+    return next(new AppError('You have already reviewed this tour.', 400));
+  }
+
+  // If the user has booked the tour and hasn't reviewed it yet, proceed
   const review = await Review.create({
     review: req.body.review,
     rating: req.body.rating,
@@ -32,7 +43,8 @@ exports.createReview = catchAsync(async (req, res, next) => {
     user: req.user.id,
   });
 
-  res.status(200).json({
+  res.status(201).json({
+    status: 'success',
     data: {
       review,
     },
