@@ -26,6 +26,8 @@ exports.getOverview = catchAsync(async (req, res, next) => {
 
 exports.getTour = catchAsync(async (req, res, next) => {
   console.log('Fetching tour details for:', req.params.slug);
+
+  // 1. Find the tour by slug
   const tour = await Tour.findOne({ slug: req.params.slug }).populate({
     path: 'reviews',
     fields: 'review rating user',
@@ -33,10 +35,26 @@ exports.getTour = catchAsync(async (req, res, next) => {
   if (!tour) {
     return next(new AppError('There is no tour with that name.', 404));
   }
-  console.log('Start Dates:', tour.startDates);
+
+  // 2. Check if the logged-in user has any bookings for this tour
+  let hasBooked = false;
+  // console.log('Checking if user is logged in:', req.user);
+  if (req.user) {
+    const userBookings = await Booking.find({ user: req.user.id }).populate(
+      'tour',
+    );
+    // Check if any of these bookings match the current tour's _id
+    hasBooked = userBookings.some(
+      (booking) => booking.tour._id.toString() === tour._id.toString(),
+    );
+    console.log('User has booked this tour:', hasBooked);
+  }
+
+  // 3. Render the page with hasBooked passed to the template
   res.status(200).render('tour', {
     title: `${tour.name} Tour`,
     tour,
+    hasBooked, // Boolean value used in the Pug template
   });
 });
 

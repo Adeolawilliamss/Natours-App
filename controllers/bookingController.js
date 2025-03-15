@@ -84,6 +84,14 @@ const createBookingCheckout = async (session) => {
     return;
   }
 
+  // Check if the booking already exists
+  const existingBooking = await Booking.findOne({ tour, user: user.id });
+
+  if (existingBooking) {
+    console.log('Booking already exists. Skipping duplicate booking creation.');
+    return;
+  }
+
   // Fetch line items from Stripe
   const lineItems = await stripe.checkout.sessions.listLineItems(session.id);
   const price = lineItems.data[0].amount_total / 100; // Convert from cents
@@ -123,6 +131,13 @@ exports.webhookCheckout = async (req, res, next) => {
 
 exports.createBooking = catchAsync(async (req, res, next) => {
   const { tourId, userId, startDate } = req.body;
+
+  // Check if the booking already exists
+  const existingBooking = await Booking.findOne({ tour: tourId, user: userId });
+
+  if (existingBooking) {
+    return next(new AppError('You have already booked this tour!', 400));
+  }
 
   // Find the tour
   const tour = await Tour.findById(tourId);
@@ -174,11 +189,6 @@ exports.deleteBooking = factory.deleteOne(Booking);
 //---------------------------------------------------------------------------------------
 
 //CHALLENGES FOR THE WEBSITE!
-//On the tour detail page,if a user has taken a tour,allow them add a review directly on a website.Implement a form for this
-
-///Hide the entire Booking section on thr tour detail page if current user hhas already booked the tour
-//(also prevent duplicate bookings on the backend model);
-
 //Implement "Like Tour" functionality,with a favourite tour page
 
 //On the user account page,ypu can implement the "My Reviews" page,where all the reviews are being displayed

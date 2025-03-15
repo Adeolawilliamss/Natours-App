@@ -277,7 +277,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   //3}Check if user still exists
   const currentUser = await User.findById(decoded.id);
-  console.log('Current User:', currentUser);
+  // console.log('Current User:', currentUser);
   if (!currentUser) {
     return next(
       new AppError('The user belonging to this token no longer exists', 401),
@@ -317,7 +317,9 @@ exports.isLoggedIn = async (req, res, next) => {
       }
 
       //IF ITS HAS BYPASSED ALL STAGES IT MEANS THERE IS A LOGGED IN USER
-      res.locals.user = currentUser;
+      // ✅ FIX: Set both `req.user` and `res.locals.user`
+      req.user = currentUser; // Now your middleware (like getTour) can use this
+      res.locals.user = currentUser; // Your Pug templates can still access `user`
       return next();
     }
   } catch (error) {
