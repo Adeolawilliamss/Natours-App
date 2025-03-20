@@ -1,0 +1,94 @@
+extends base
+
+block content
+    main.main
+        .admin-container
+            h1 Manage Bookings
+            p Create, update, or delete bookings.
+
+            if booking
+                // Form for adding or editing a booking
+                form#booking-form(method="POST" action="/admin/bookings")
+                    input(type="hidden" id="bookingId" name="bookingId")
+
+                    .form-group
+                        label(for="tour") Tour:
+                        select#tour(name="tour" required)
+                            if bookings.length
+                                each t in bookings
+                                    option(value=t.tour._id selected=booking && booking.tour && booking.tour._id === t.tour._id)= t.tour.name
+                            else
+                                option(disabled selected) No tours available
+
+                    .form-group
+                        label(for="user") User:
+                        select#user(name="user" required)
+                            if bookings.length
+                                each u in bookings
+                                    option(value=u.user._id selected=booking && booking.user && booking.user._id === u.user._id)= u.user.name
+                            else
+                                option(disabled selected) No users available
+
+                    .form-group
+                        label(for="price") Price:
+                        input#price(type="number" name="price" required value=booking ? booking.price : '')
+
+                    .form-group
+                        label(for="startDate") Start Date:
+                        input#startDate(type="date" name="startDate" required value=booking ? booking.startDate.toISOString().split('T')[0] : '')
+
+                    .form-group
+                        label(for="paid") Payment Status:
+                        select#paid(name="paid" required)
+                            option(value="true" selected=booking && booking.paid === true) Paid
+                            option(value="false" selected=booking && booking.paid === false) Not Paid
+
+                    button.admin-btn(type="submit") #{booking ? 'Update' : 'Create'} Booking
+
+            hr
+
+            // Table to display all bookings
+            h2 Existing Bookings
+            table
+                thead
+                    tr
+                        th Tour
+                        th User
+                        th Price
+                        th Start Date
+                        th Paid
+                        th Actions
+                tbody
+                    each booking in bookings
+                        tr
+                            td= booking.tour ? booking.tour.name : 'Unknown Tour'
+                            td= booking.user ? booking.user.name : 'Unknown User'
+                            td= booking.price
+                            td= new Date(booking.startDate).toLocaleDateString()
+                            td= booking.paid ? 'Yes' : 'No'
+                            td
+                                button.edit-btn(onclick="editBooking('#{booking._id}')") Edit
+                                button.delete-btn(onclick="deleteBooking('#{booking._id}')") Delete
+
+            script.
+                function editBooking(bookingId) {
+                    fetch(`/api/bookings/${bookingId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            document.getElementById('bookingId').value = data._id;
+                            document.getElementById('tour').value = data.tour._id;
+                            document.getElementById('user').value = data.user._id;
+                            document.getElementById('price').value = data.price;
+                            document.getElementById('startDate').value = new Date(data.startDate).toISOString().split('T')[0];
+                            document.getElementById('paid').value = data.paid;
+                        })
+                        .catch(err => console.error(err));
+                }
+
+                function deleteBooking(bookingId) {
+                    if (confirm("Are you sure you want to delete this booking?")) {
+                        fetch(`/api/bookings/${bookingId}`, { method: 'DELETE' })
+                            .then(() => location.reload())
+                            .catch(err => console.error(err));
+                    }
+                }

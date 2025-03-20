@@ -1,0 +1,57 @@
+extends base
+
+block content
+    main.main
+        .admin-container
+            h1 Manage Users
+            p Create, update, or delete users.
+
+            // Debugging Line - Check if User is Logged In
+            p Debug: User is #{loggedInUser ? loggedInUser.name : 'Not Logged In'}
+
+            // Form for adding or editing a user
+            form#user-form(method="POST" action="/admin/users" enctype="multipart/form-data")
+                input(type="hidden" id="userId" name="userId" value=user ? user._id : '')
+
+                .form-group
+                    label(for="name") Name:
+                    input#name(type="text" name="name" required placeholder="Enter user name" value=user ? user.name : '')
+
+                .form-group
+                    label(for="email") Email:
+                    input#email(type="email" name="email" required placeholder="Enter email" value=user ? user.email : '')
+
+                .form-group
+                    label(for="role") Role:
+                    select#role(name="role" required)
+                        option(value="user" selected=user && user.role === "user") User
+                        option(value="guide" selected=user && user.role === "guide") Guide
+                        option(value="lead-guide" selected=user && user.role === "lead-guide") Lead Guide
+                        option(value="admin" selected=user && user.role === "admin") Admin
+
+                .form-group
+                    label(for="photo") Profile Picture:
+                    input#photo(type="file" name="photo" accept="image/*")
+
+                button.admin-btn(type="submit") #{user ? 'Update' : 'Save'} User
+
+            hr
+
+            // Table to display all users
+            h2 Existing Users
+            table
+                thead
+                    tr
+                        th Name
+                        th Email
+                        th Role
+                        th Actions
+                tbody
+                    each user in users
+                        tr
+                            td= user.name
+                            td= user.email
+                            td= user.role
+                            td
+                                button.edit-btn(onclick="editUser('#{user._id}')") Edit
+                                button.delete-btn(onclick="deleteUser('#{user._id}')") Delete

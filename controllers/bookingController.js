@@ -194,4 +194,4 @@ exports.deleteBooking = factory.deleteOne(Booking);
 //On the user account page,ypu can implement the "My Reviews" page,where all the reviews are being displayed
 //and a user can edit them(If you know React,this would be an amazing way to use the Natours API and train your skills);
 
-//For administrators,implement the "Manage" pages,where they can CRUD(create,read,update,delete)tours,useers,reviews ,bookings
+//For administrators,implement the "Manage" pages,where they can CRUD(create,read,update,delete)tours,users,reviews,bookings

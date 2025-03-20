@@ -126,6 +126,11 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use((req, res, next) => {
+  res.locals.user = req.user || null;
+  next();
+});
+
 //ROUTES
 app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter);

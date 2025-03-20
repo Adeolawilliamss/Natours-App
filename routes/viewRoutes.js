@@ -27,6 +27,30 @@ router.get('/me', authController.protect, viewController.getAccount);
 router.get('/my-tours', authController.protect, viewController.getMyTours);
 router.get('/my-reviews', authController.protect, viewController.getMyReviews);
 
+// router.use(authController.restrictTo('admin'));
+router.get(
+  '/manage-tours',
+  authController.protect,
+  viewController.getManageTourPage,
+);
+router.get(
+  '/manage-users',
+  authController.protect,
+  viewController.getManageUserPage,
+);
+
+router.get(
+  '/manage-reviews',
+  authController.protect,
+  viewController.getManageReviewsPage,
+);
+
+router.get(
+  '/manage-bookings',
+  authController.protect,
+  viewController.getManageBookingsPage,
+);
+
 router.post(
   '/submit-user-data',
   authController.protect,
