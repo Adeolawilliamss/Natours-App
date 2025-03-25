@@ -89,6 +89,36 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.updateUser = catchAsync(async (req, res, next) => {
+  console.log('🔥 Middleware triggered!'); // Add this first
+  console.log('Received update request for user:', req.params.id);
+  console.log('Request body:', req.body);
+  if (!req.user || req.user.role !== 'admin') {
+    return next(
+      new AppError('You are not authorized to perform this action', 403),
+    );
+  }
+
+  const filteredBody = filterObj(req.body, 'role'); // Allow only role update
+  const updatedUser = await User.findByIdAndUpdate(
+    req.params.id,
+    filteredBody,
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
+
+  if (!updatedUser) {
+    return next(new AppError('No user found with that ID', 404));
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: { user: updatedUser },
+  });
+});
+
 exports.DeleteMe = catchAsync(async (req, res, next) => {
   await User.findByIdAndUpdate(req.user.id, { active: false });
   res.status(204).json({

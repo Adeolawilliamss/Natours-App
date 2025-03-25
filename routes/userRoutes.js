@@ -27,6 +27,9 @@ router.patch(
   userController.resizeUserPhoto,
   userController.updateMe,
 );
+
+router.patch('/updateUser/:id', userController.updateUser);
+
 router.delete('/deleteMe', userController.DeleteMe);
 
 router.use(authController.restrictTo('admin'));

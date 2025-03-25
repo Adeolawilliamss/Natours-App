@@ -186,12 +186,3 @@ exports.getBooking = factory.getOne(Booking);
 exports.getAllBookings = factory.getAll(Booking);
 exports.updateBooking = factory.updateOne(Booking);
 exports.deleteBooking = factory.deleteOne(Booking);
-//---------------------------------------------------------------------------------------
-
-//CHALLENGES FOR THE WEBSITE!
-//Implement "Like Tour" functionality,with a favourite tour page
-
-//On the user account page,ypu can implement the "My Reviews" page,where all the reviews are being displayed
-//and a user can edit them(If you know React,this would be an amazing way to use the Natours API and train your skills);
-
-//For administrators,implement the "Manage" pages,where they can CRUD(create,read,update,delete)tours,users,reviews,bookings

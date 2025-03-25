@@ -16,6 +16,8 @@ const DB = process.env.DATABASE.replace(
   '<PASSWORD>',
   process.env.DATABASE_PASSWORD,
 );
+// 🛠️ Set Mongoose global settings
+mongoose.set('bufferTimeoutMS', 30000); // Increase timeout for queries
 
 mongoose
   .connect(DB, {

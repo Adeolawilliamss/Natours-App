@@ -10,7 +10,7 @@ block content
             p Debug: User is #{loggedInUser ? loggedInUser.name : 'Not Logged In'}
 
             // Form for adding or editing a user
-            form#user-form(method="POST" action="/admin/users" enctype="multipart/form-data")
+            form.user-form
                 input(type="hidden" id="userId" name="userId" value=user ? user._id : '')
 
                 .form-group
@@ -20,6 +20,15 @@ block content
                 .form-group
                     label(for="email") Email:
                     input#email(type="email" name="email" required placeholder="Enter email" value=user ? user.email : '')
+
+                .form-group
+                    label(for="password") Password:
+                    input#password(type="password" name="password" required placeholder="Enter Password" value=user ? user.password : '')
+
+                .form-group
+                    label(for="passwordConfirm") Password Confirm:
+                    input#passwordConfirm(type="password" name="passwordConfirm" required placeholder="Verify Password" value=user ? user.passwordConfirm : '')
+
 
                 .form-group
                     label(for="role") Role:
@@ -53,5 +62,31 @@ block content
                             td= user.email
                             td= user.role
                             td
-                                button.edit-btn(onclick="editUser('#{user._id}')") Edit
+                                button.edit-btn(data-id=user._id data-name=user.name data-email=user.email data-role=user.role) Edit
                                 button.delete-btn(onclick="deleteUser('#{user._id}')") Delete
+
+    // Popup for Editing User
+    #popup.popup.hidden
+        .popup-content
+            h2 Edit User
+            form#user-form
+                input(type="hidden" id="popup-userId" name="userId")
+
+                .form-group
+                    label(for="name") Name:
+                    input#popup-name(type="text" name="name" required readonly)
+
+                .form-group
+                    label(for="email") Email:
+                    input#popup-email(type="email" name="email" required readonly)
+
+                .form-group
+                    label(for="role") Role:
+                    select#popup-role(name="role" required)
+                        option(value="user") User
+                        option(value="guide") Guide
+                        option(value="lead-guide") Lead Guide
+                        option(value="admin") Admin
+
+                button(type="submit").admin-btn#update-user Update User
+                button.popup-close(type="button") Close
