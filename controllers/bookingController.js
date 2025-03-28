@@ -129,60 +129,32 @@ exports.webhookCheckout = async (req, res, next) => {
   res.status(200).json({ received: true });
 };
 
-exports.createBooking = catchAsync(async (req, res, next) => {
-  const { tourId, userId, startDate } = req.body;
+exports.updateBooking = catchAsync(async (req, res, next) => {
+  console.log('Request body:', req.body);
+  console.log('Updating booking with ID:', req.params.id);
 
-  // Check if the booking already exists
-  const existingBooking = await Booking.findOne({ tour: tourId, user: userId });
-
-  if (existingBooking) {
-    return next(new AppError('You have already booked this tour!', 400));
+  if (!req.user || req.user.role !== 'admin') {
+    return next(
+      new AppError('You are not authorized to perform this action', 403),
+    );
   }
 
-  // Find the tour
-  const tour = await Tour.findById(tourId);
-  if (!tour) return next(new AppError('Tour not found', 404));
-
-  // Find the selected date
-  const tourDate = tour.startDates.find(
-    (entry) => entry.date.toISOString() === new Date(startDate).toISOString(),
+  const updatedBooking = await Booking.findByIdAndUpdate(
+    req.params.id,
+    { price: req.body.price, paid: req.body.paid === 'Yes' },
+    { new: true, runValidators: true },
   );
 
-  if (!tourDate) return next(new AppError('Invalid tour date', 400));
-
-  // Check if the tour is sold out
-  if (tourDate.soldOut) {
-    return next(new AppError('This tour date is fully booked', 400));
+  if (!updatedBooking) {
+    return next(new AppError('No booking found with that ID', 404));
   }
 
-  // Increase participants
-  tourDate.participants += 1;
-
-  // Mark as sold out if maxGroupSize is exceeded
-  if (tourDate.participants >= tour.maxGroupSize) {
-    tourDate.soldOut = true;
-  }
-
-  // Save the updated tour
-  await tour.save();
-
-  // Create a new booking
-  const newBooking = await Booking.create({
-    tour: tourId,
-    user: userId,
-    startDate: new Date(startDate), // ✅ Ensure startDate is saved as a Date
-    price: tour.price,
-  });
-
-  res.status(201).json({
+  res.status(200).json({
     status: 'success',
-    data: {
-      booking: newBooking,
-    },
+    data: { booking: updatedBooking },
   });
 });
 
 exports.getBooking = factory.getOne(Booking);
 exports.getAllBookings = factory.getAll(Booking);
-exports.updateBooking = factory.updateOne(Booking);
 exports.deleteBooking = factory.deleteOne(Booking);

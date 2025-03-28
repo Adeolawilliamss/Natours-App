@@ -8,7 +8,7 @@ block content
 
             if review
                 // Form for editing a review
-                form.review-form(method="POST" action="/admin/reviews")
+                form#review-form
                     input(type="hidden" id="reviewId" name="reviewId")
 
                     .form-group
@@ -28,22 +28,6 @@ block content
                                     option(value=u._id selected=review && review.user && review.user._id === u._id)= u.name
                             else
                                 option(disabled selected) No users available
-
-                    .form-group
-                        label(for="rating") Rating:
-                        select#rating(name="rating" required)
-                            option(value="5" selected=review && review.rating === 5) ⭐⭐⭐⭐⭐
-                            option(value="4" selected=review && review.rating === 4) ⭐⭐⭐⭐
-                            option(value="3" selected=review && review.rating === 3) ⭐⭐⭐
-                            option(value="2" selected=review && review.rating === 2) ⭐⭐
-                            option(value="1" selected=review && review.rating === 1) ⭐
-
-                    .form-group
-                        label(for="review") Review:
-                        textarea#review(name="review" rows="5" required)= review ? review.review : ''
-
-                    button.admin-btn(type="submit") Update Review
-
             hr
 
             // Table to display all reviews
@@ -64,27 +48,28 @@ block content
                             td= review.rating
                             td= review.review
                             td
-                                button.edit-btn(onclick="editReview('#{review._id}')") Edit
-                                button.delete-btn(onclick="deleteReview('#{review._id}')") Delete
+                                button.edit-btn.editReviews-btn(data-id=review._id data-rating=review.rating data-review=review.review) Edit
+                                button.delete-btn.deleteReviews-btn(data-id=review._id) Delete
 
-            script.
-                function editReview(reviewId) {
-                    fetch(`/api/reviews/${reviewId}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            document.getElementById('reviewId').value = data._id;
-                            document.getElementById('tour').value = data.tour._id;
-                            document.getElementById('user').value = data.user._id;
-                            document.getElementById('rating').value = data.rating;
-                            document.getElementById('review').value = data.review;
-                        })
-                        .catch(err => console.error(err));
-                }
+    // Popup for Editing User
+    #popup.popup.hidden
+        .popup-content
+            h2 Edit Reviews
+            form#reviews-form
+                input(type="hidden" id="popup-userId" name="userId")
 
-                function deleteReview(reviewId) {
-                    if (confirm("Are you sure you want to delete this review?")) {
-                        fetch(`/api/reviews/${reviewId}`, { method: 'DELETE' })
-                            .then(() => location.reload())
-                            .catch(err => console.error(err));
-                    }
-                }
+                .form-group
+                    label(for="rating") Ratings:
+                    select#popup-rating(name="rating" required)
+                        option(value="5") 5
+                        option(value="4") 4
+                        option(value="3") 3
+                        option(value="2") 2
+                        option(value="1") 1
+
+                .form-group
+                    label(for="review") Review:
+                    input#popup-review(type="text" name="review")
+
+                button(type="submit").admin-btn#update-review Update Booking
+                button.popup-close(type="button") Close

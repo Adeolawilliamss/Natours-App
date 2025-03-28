@@ -7,8 +7,8 @@ block content
             p Create, update, or delete tours.
 
             // Form for adding or editing a tour
-            form#tour-form(method="POST" action="/admin/tours" enctype="multipart/form-data")
-                input(type="hidden" id="tourId" name="tourId")
+            form#tour-form
+                input(type="hidden" id="tourId" name="tourId" value=tour ? tour._id : '')
 
                 .form-group
                     label(for="name") Tour Name:
@@ -34,8 +34,21 @@ block content
                         option(value="difficult") Difficult
 
                 .form-group
+                    label(for="summary") Summary:
+                    input#summary(type="text" name="summary" required placeholder="Enter a short summary")
+
+                .form-group
                     label(for="description") Description:
                     textarea#description(name="description" rows="4" required placeholder="Tour description...")
+
+                .form-group
+                    label(for="startDates") Start Dates:
+                    input#startDates(type="date" name="startDates" multiple) 
+
+                .form-group
+                    label(for="startLocation") Start Location (Latitude, Longitude):
+                    input#latitude(type="text" name="latitude" required placeholder="Latitude")
+                    input#longitude(type="text" name="longitude" required placeholder="Longitude")
 
                 .form-group
                     label(for="imageCover") Cover Image:
@@ -45,7 +58,8 @@ block content
                     label(for="images") Additional Images:
                     input#images(type="file" name="images" accept="image/*" multiple)
 
-                button.admin-btn(type="submit") Save Tour
+                button.admin-btn(type="submit") #{tour ? 'Update' : 'Save'} Tour
+
 
             hr
 
@@ -69,29 +83,40 @@ block content
                             td= tour.maxGroupSize
                             td= tour.difficulty
                             td
-                                button.edit-btn(onclick="editTour('#{tour._id}')") Edit
-                                button.delete-btn(onclick="deleteTour('#{tour._id}')") Delete
+                                button.edit-btn.editTours-btn(
+                                data-id=tour._id 
+                                data-duration=tour.duration 
+                                data-price=tour.price 
+                                data-maxGroupSize=tour.maxGroupSize 
+                                data-difficulty=tour.difficulty) Edit
+                                button.delete-btn.deleteTours-btn(data-id=tour._id) Delete
 
-            script.
-                function editTour(tourId) {
-                    fetch(`/api/tours/${tourId}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            document.getElementById('tourId').value = data._id;
-                            document.getElementById('name').value = data.name;
-                            document.getElementById('duration').value = data.duration;
-                            document.getElementById('price').value = data.price;
-                            document.getElementById('maxGroupSize').value = data.maxGroupSize;
-                            document.getElementById('difficulty').value = data.difficulty;
-                            document.getElementById('description').value = data.description;
-                        })
-                        .catch(err => console.error(err));
-                }
 
-                function deleteTour(tourId) {
-                    if (confirm("Are you sure you want to delete this tour?")) {
-                        fetch(`/api/tours/${tourId}`, { method: 'DELETE' })
-                            .then(() => location.reload())
-                            .catch(err => console.error(err));
-                    }
-                }
+        // Popup for Editing Tour
+        #popup.popup.hidden
+            .popup-content
+                h2 Edit Tours
+                form#popup-tour-form
+                    input(type="hidden" id="popup-tourId" name="tourId")
+
+                    .form-group
+                        label(for="duration") Duration:
+                        input#popup-duration(type="number" name="duration")
+
+                    .form-group
+                        label(for="price") Price:
+                        input#popup-price(type="number" name="price")
+                    
+                    .form-group
+                        label(for="group-size") Group Size:
+                        input#popup-group-size(type="number" name="maxGroupSize")
+
+                    .form-group
+                        label(for="difficulty") Difficulty:
+                        select#popup-difficulty(name="difficulty" required)
+                            option(value="difficult") Difficult
+                            option(value="medium") Medium
+                            option(value="easy") Easy
+
+                    button(type="submit").admin-btn#update-tour Update Tour
+                    button.popup-close(type="button") Close

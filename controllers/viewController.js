@@ -133,24 +133,39 @@ exports.getManageReviewsPage = catchAsync(async (req, res, next) => {
 });
 
 exports.getManageBookingsPage = catchAsync(async (req, res, next) => {
-  // Fetch all users for display
+  // Fetch all bookings and populate the 'tour' field
   const bookings = await Booking.find();
+  await Booking.populate(bookings, { path: 'tour', select: 'startDates name' });
 
-  // Fetch a single user if an ID is provided
+  // Format startDates for each booking
+  const formattedBookings = bookings.map((booking) => {
+    const formattedDates = booking.tour?.startDates
+      ?.map((sd) =>
+        new Date(sd.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })
+      )
+      .join(', ');
+
+    return {
+      ...booking.toObject(),
+      formattedStartDates: formattedDates || 'No dates available',
+    };
+  });
+
+  console.log(formattedBookings);
+
+  // Fetch a single booking if an ID is provided
   let booking = null;
   if (req.params.id) {
-    booking = await Booking.findById(req.params.id);
-    if (!booking) {
-      return next(new AppError('No user found with that ID.', 404));
-    }
+    booking = await Booking.findById(req.params.id)
   }
 
   res.status(200).render('manageBookings', {
     title: 'Bookings Admin Page',
-    bookings,
-    booking, // Pass single user for editing
+    bookings: formattedBookings,
+    booking,
   });
 });
+
 
 exports.leaveReviews = catchAsync(async (req, res, next) => {
   const tour = await Tour.findOne({ slug: req.params.slug });

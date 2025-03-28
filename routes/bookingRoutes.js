@@ -16,11 +16,12 @@ router.post(
   authController.protect,
   authController.restrictTo('user'),
   bookingController.setTourUserIDs, // Automatically assigns tour & user ID
-  bookingController.createBooking,
 );
 
 // Get all bookings, with filtering by user or tour
 router.get('/', bookingController.getAllBookings);
+
+router.patch('/updateBooking/:id', bookingController.updateBooking);
 
 router
   .route('/:id')

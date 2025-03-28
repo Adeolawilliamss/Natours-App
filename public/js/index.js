@@ -2,13 +2,15 @@
 import '@babel/polyfill';
 import { login, logout } from './login';
 import { signup } from './signup';
-import { userAdmin } from './users-admin';
 import { reviews } from './reviews';
 import { verifyOtp } from './otp';
 import { updateSettings } from './updateSettings';
 import { bookTour } from './stripe';
 import { showAlert } from './alerts';
-import { editUser } from './editUsers';
+import { createUser, editUser, deleteUser } from './admin/editUsers';
+import { createTour, editTour, deleteTour } from './admin/editTours';
+import { editBooking, deleteBooking } from './admin/editBookings';
+import { editReview, deleteReview } from './admin/editReviews';
 
 // DOM ELEMENTS
 const logInForm = document.querySelector('.form--login');
@@ -20,9 +22,17 @@ const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
 const bookBtn = document.getElementById('book-tour');
 const userAdminForm = document.querySelector('.user-form');
-const editButtons = document.querySelectorAll('.edit-btn');
-
-console.log('Edit buttons found:', editButtons.length); // Debugging
+const tourAdminForm = document.getElementById('tour-form');
+const popupClose = document.querySelector('.popup-close');
+const popup = document.querySelector('.popup');
+const editUsers = document.querySelectorAll('.editUser-btn');
+const editBookings = document.querySelectorAll('.editBooking-btn');
+const editReviews = document.querySelectorAll('.editReviews-btn');
+const editTours = document.querySelectorAll('.editTours-btn');
+const deleteReviews = document.querySelectorAll('.deleteReviews-btn');
+const deleteUsers = document.querySelectorAll('.deleteUser-btn');
+const deleteBookings = document.querySelectorAll('.deleteBooking-btn');
+const deleteTours = document.querySelectorAll('.deleteTours-btn');
 
 if (userAdminForm) {
   userAdminForm.addEventListener('submit', (e) => {
@@ -34,7 +44,40 @@ if (userAdminForm) {
     const role = document.getElementById('role').value;
     const photo = document.getElementById('photo').value;
 
-    userAdmin(name, email, password, passwordConfirm, role, photo);
+    createUser(name, email, password, passwordConfirm, role, photo);
+  });
+}
+
+if (tourAdminForm) {
+  tourAdminForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = document.getElementById('name').value;
+    const duration = document.getElementById('duration').value;
+    const price = document.getElementById('price').value;
+    const maxGroupSize = document.getElementById('maxGroupSize').value;
+    const difficulty = document.getElementById('difficulty').value;
+    const description = document.getElementById('description').value;
+    const imageCover = document.getElementById('imageCover').value;
+    const images = document.getElementById('images').value;
+    const summary = document.getElementById('summary').value;
+    const startDates = document.getElementById('startDates').value;
+    const latitude = document.getElementById('latitude').value;
+    const longitude = document.getElementById('longitude').value;
+
+    createTour(
+      name,
+      duration,
+      price,
+      maxGroupSize,
+      difficulty,
+      description,
+      imageCover,
+      images,
+      summary,
+      startDates,
+      latitude,
+      longitude,
+    );
   });
 }
 
@@ -49,22 +92,99 @@ if (logInForm) {
 
 if (logOutBtn) logOutBtn.addEventListener('click', logout);
 
-if(editButtons) {
-    // Attach event listener to each edit button
-editButtons.forEach((button) => {
-  button.addEventListener('click', (event) => {
-
-    const row = event.target.closest('tr');
-    if (!row) return;
-
-    const id = event.target.getAttribute('data-id'); // Get the ID from the button itself
-    const name = row.children[0].textContent;
-    const email = row.children[1].textContent;
-    const role = row.children[2].textContent;
-
-    editUser(id, name, email, role); // Pass data to editUser function
+if (deleteUsers) {
+  deleteUsers.forEach((btn) => {
+    btn.addEventListener('click', deleteUser);
   });
-});
+}
+
+if (deleteBookings) {
+  deleteBookings.forEach((btn) => {
+    btn.addEventListener('click', deleteBooking);
+  });
+}
+
+if (deleteTours) {
+  deleteTours.forEach((btn) => {
+    btn.addEventListener('click', deleteTour);
+  });
+}
+
+if (deleteReviews) {
+  deleteReviews.forEach((btn) => {
+    btn.addEventListener('click', deleteReview);
+  });
+}
+
+if (popupClose) {
+  popupClose.addEventListener('click', () => {
+    popup.classList.add('hidden'); // Add a hidden class
+    popup.style.display = 'none'; // Hide using inline CSS
+  });
+}
+
+if (editUsers) {
+  // Attach event listener to each edit button
+  editUsers.forEach((button) => {
+    button.addEventListener('click', (event) => {
+      const row = event.target.closest('tr');
+      if (!row) return;
+
+      const id = event.target.getAttribute('data-id'); // Get the ID from the button itself
+      const name = row.children[0].textContent;
+      const email = row.children[1].textContent;
+      const role = row.children[2].textContent;
+
+      editUser(id, name, email, role); // Pass data to editUser function
+    });
+  });
+}
+
+if (editBookings) {
+  // Attach event listener to each edit button
+  editBookings.forEach((button) => {
+    button.addEventListener('click', (event) => {
+      const row = event.target.closest('tr');
+      if (!row) return;
+
+      const id = event.target.getAttribute('data-id'); // Get the ID from the button itself
+      const price = row.children[2].textContent;
+      const paid = row.children[4].textContent;
+
+      editBooking(id, price, paid);
+    });
+  });
+}
+
+if (editReviews) {
+  // Attach event listener to each edit button
+  editReviews.forEach((button) => {
+    button.addEventListener('click', (event) => {
+      const row = event.target.closest('tr');
+      if (!row) return;
+      const id = event.target.getAttribute('data-id'); // Get the ID from the button itself
+      const rating = row.children[2].textContent;
+      const review = row.children[3].textContent;
+
+      editReview(id, rating, review);
+    });
+  });
+}
+
+if (editTours) {
+  // Attach event listener to each edit button
+  editTours.forEach((button) => {
+    button.addEventListener('click', (event) => {
+      const row = event.target.closest('tr');
+      if (!row) return;
+      const id = event.target.getAttribute('data-id'); // Get the ID from the button itself
+      const duration = row.children[1].textContent;
+      const price = row.children[2].textContent;
+      const maxGroupSize = row.children[3].textContent;
+      const difficulty = row.children[4].textContent;
+      editTour(id, duration, price, maxGroupSize, difficulty);
+    });
+  });
 }
 
 if (otpInForm) {

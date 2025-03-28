@@ -7,7 +7,7 @@ block content
             p Create, update, or delete users.
 
             // Debugging Line - Check if User is Logged In
-            p Debug: User is #{loggedInUser ? loggedInUser.name : 'Not Logged In'}
+            p User is #{loggedInUser ? loggedInUser.name : 'Not Logged In'}
 
             // Form for adding or editing a user
             form.user-form
@@ -62,8 +62,8 @@ block content
                             td= user.email
                             td= user.role
                             td
-                                button.edit-btn(data-id=user._id data-name=user.name data-email=user.email data-role=user.role) Edit
-                                button.delete-btn(onclick="deleteUser('#{user._id}')") Delete
+                                button.edit-btn.editUser-btn(data-id=user._id data-name=user.name data-email=user.email data-role=user.role) Edit
+                                button.delete-btn.deleteUser-btn(data-id=user._id) Delete
 
     // Popup for Editing User
     #popup.popup.hidden
