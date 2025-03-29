@@ -26,7 +26,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
     // success_url: `${req.protocol}://${req.get('host')}/?tour=${req.params.tourId}&user=${req.user.id}&price=${tour.price}`,
-    success_url: `${req.protocol}://${req.get('host')}/my-tours?alert=booking`,
+    success_url: `${req.protocol}://${req.get('host')}/my-bookings?alert=booking`,
     cancel_url: `${req.protocol}://${req.get('host')}/tour/${tour.slug}`,
     customer_email: req.user.email,
     client_reference_id: req.params.tourId,
@@ -77,7 +77,9 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 // });
 const createBookingCheckout = async (session) => {
   const tour = session.client_reference_id;
+  console.log(tour);
   const user = await User.findOne({ email: session.customer_email });
+  console.log(user);
 
   if (!user) {
     console.error('User not found:', session.customer_email);
@@ -100,8 +102,39 @@ const createBookingCheckout = async (session) => {
     tour: new mongoose.Types.ObjectId(tour),
     user: new mongoose.Types.ObjectId(user.id),
     price: parseFloat(price),
+    startDate: new Date(), // or a specific date if available
   });
 };
+
+exports.createBooking = catchAsync(async (req, res, next) => {
+  // Destructure required fields from the request body
+  const { tour, user, price } = req.body;
+
+  if (!tour || !user || !price) {
+    return next(
+      new AppError(
+        'Missing required booking fields: tour, user, price, and startDate are required',
+        400,
+      ),
+    );
+  }
+
+  // Create the booking. Mongoose will convert string IDs to ObjectIds automatically,
+  // but you can also use mongoose.Types.ObjectId if needed.
+  const newBooking = await Booking.create({
+    tour,
+    user,
+    price,
+  });
+
+  // Respond with the newly created booking
+  res.status(201).json({
+    status: 'success',
+    data: {
+      booking: newBooking,
+    },
+  });
+});
 
 exports.webhookCheckout = async (req, res, next) => {
   const signature = req.headers['stripe-signature'];
@@ -113,6 +146,7 @@ exports.webhookCheckout = async (req, res, next) => {
       signature,
       process.env.STRIPE_WEBHOOK_SECRET,
     );
+    console.log('Webhook event received:', event.type);
   } catch (error) {
     console.error('⚠️  Webhook signature verification failed.', error.message);
     return res.status(400).send(`Webhook error: ${error.message}`);

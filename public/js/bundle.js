@@ -12655,7 +12655,7 @@ var logout = exports.logout = /*#__PURE__*/function () {
           _context2.prev = 0;
           _context2.next = 3;
           return (0, _axios.default)({
-            method: 'GET',
+            method: 'POST',
             url: '/api/v1/users/logout'
           });
         case 3:
@@ -12939,6 +12939,9 @@ var updateSettings = exports.updateSettings = /*#__PURE__*/function () {
           console.log('Response:', res.data);
           if (res.data.status === 'success') {
             (0, _alerts.showAlert)('success', "".concat(type.toUpperCase(), " updated successfully!"));
+            setTimeout(function () {
+              return location.assign('/me');
+            }, 1500);
           }
           _context.next = 12;
           break;
@@ -13184,23 +13187,26 @@ var bookTour = exports.bookTour = /*#__PURE__*/function () {
           return _axios.default.get("/api/v1/bookings/checkout-session/".concat(tourId));
         case 9:
           session = _context2.sent;
-          _context2.next = 12;
+          console.log('Session:', session.data);
+
+          // 2. Redirect to Stripe checkout
+          _context2.next = 13;
           return stripe.redirectToCheckout({
             sessionId: session.data.session.id
           });
-        case 12:
-          _context2.next = 18;
+        case 13:
+          _context2.next = 19;
           break;
-        case 14:
-          _context2.prev = 14;
+        case 15:
+          _context2.prev = 15;
           _context2.t0 = _context2["catch"](0);
           console.error('Error booking tour:', _context2.t0);
           (0, _alerts.showAlert)('error', _context2.t0);
-        case 18:
+        case 19:
         case "end":
           return _context2.stop();
       }
-    }, _callee2, null, [[0, 14]]);
+    }, _callee2, null, [[0, 15]]);
   }));
   return function bookTour(_x) {
     return _ref2.apply(this, arguments);
@@ -13254,6 +13260,9 @@ var createUser = exports.createUser = /*#__PURE__*/function () {
           res = _context.sent;
           if (res.data.status === 'success') {
             (0, _alerts.showAlert)('success', 'SUCCESS!');
+            setTimeout(function () {
+              return location.assign('/manage-users');
+            }, 1500);
           }
           _context.next = 11;
           break;
@@ -14333,7 +14342,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62253" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53838" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

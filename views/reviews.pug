@@ -3,8 +3,8 @@ extends base
 block content
     main.main
         .reviews-container
-            each review in reviews
-                if review.tour
+            if reviews.length > 0
+                each review in reviews
                     .review-card
                         .review-header
                             img.review-img(src=`/img/tours/${review.tour.imageCover}`, alt=`${review.tour.name}`)
@@ -13,5 +13,7 @@ block content
                             p.review-text= review.review
                             p.review-rating
                                 span= `Rating: ${review.rating} ⭐`
-                else
-                    p No associated Review for Any Tour.
+            else
+                .no-data
+                    h2 No Reviews Available
+                    p You haven't submitted any reviews yet.

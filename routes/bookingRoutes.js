@@ -14,12 +14,19 @@ router.get('/checkout-session/:tourId', bookingController.getCheckoutSession);
 router.post(
   '/',
   authController.protect,
-  authController.restrictTo('user'),
+  authController.restrictTo('admin', 'user'),
   bookingController.setTourUserIDs, // Automatically assigns tour & user ID
 );
 
 // Get all bookings, with filtering by user or tour
-router.get('/', bookingController.getAllBookings);
+router
+  .route('/')
+  .get(bookingController.getAllBookings)
+  .post(
+    authController.protect,
+    authController.restrictTo('admin', 'user'),
+    bookingController.createBooking,
+  );
 
 router.patch('/updateBooking/:id', bookingController.updateBooking);
 

@@ -20,6 +20,7 @@ export const updateSettings = async (data, type) => {
 
     if (res.data.status === 'success') {
       showAlert('success', `${type.toUpperCase()} updated successfully!`);
+      setTimeout(() => location.assign('/me'), 1500);
     }
   } catch (error) {
     showAlert('error', error.response.data.message);

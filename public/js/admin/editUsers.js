@@ -19,6 +19,7 @@ export const createUser = async (
 
     if (res.data.status === 'success') {
       showAlert('success', 'SUCCESS!');
+      setTimeout(() => location.assign('/manage-users'), 1500);
     }
   } catch (error) {
     console.log('User Create Failed:', error.response?.data); // ✅ Debugging log

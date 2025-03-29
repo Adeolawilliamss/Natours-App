@@ -1711,3 +1711,9 @@ input[readonly] {
   background-color: #f0f0f0; /* Light gray background */
   cursor: not-allowed; /* Show a disabled cursor */
 }
+
+.no-data {
+  text-align: center;
+  font-size: large;
+  text-decoration: #20bf6b;
+}
