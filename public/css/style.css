@@ -1070,11 +1070,6 @@ body {
     padding-top: 1rem;
   }
 }
-
-.nav--user {
-  gap: 5px;
-}
-
 .nav {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -1106,12 +1101,28 @@ body {
   }
 }
 .nav--user {
+  gap: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: transform 0.2s ease-in-out; /* Smooth transition */
+}
+
+/* Apply effect to 'All Tours', 'Log Out', and User Profile */
+.nav__el:hover,
+.nav__el:active,
+.nav__el--user:hover,
+.nav__el--user:active {
+  transform: translateY(-4px); /* Jump effect */
+}
+.nav--user {
   -webkit-box-flex: 0;
   -ms-flex: 0 1 40%;
   flex: 0 1 40%;
   -webkit-box-pack: end;
   -ms-flex-pack: end;
   justify-content: flex-end;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out; /* Smooth transition */
 }
 .nav__el,
 .nav__el:link,
@@ -1131,8 +1142,6 @@ body {
   font-weight: 400;
   background: none;
   border: none;
-  cursor: pointer;
-  font-family: inherit;
 }
 
 @media (max-width: 1000px) {
