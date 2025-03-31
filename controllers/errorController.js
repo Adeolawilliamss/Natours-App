@@ -62,10 +62,12 @@ const sendErrorProd = (err, req, res) => {
   }
   // RENDERED WEBSITE
   // A} Operational, trusted error: send message to client
+  const overviewClass = 'overview-page';
   if (err.isOperational) {
     return res.status(err.statusCode).render('error', {
       title: 'Something went wrong!',
       msg: err.message,
+      overviewClass,
     });
   }
   // B} Programming or other unknown errors: Don't leak error details
