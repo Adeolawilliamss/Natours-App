@@ -971,6 +971,7 @@ body {
   }
 }
 
+/* User View Container */
 .user-view {
   background-color: #fff;
   max-width: 120rem;
@@ -978,37 +979,136 @@ body {
   min-height: 100vh;
   border-radius: 3px;
   overflow: hidden;
-  -webkit-box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.07);
   box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.07);
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
+  flex-direction: row; /* Default: Sidebar on the left, content on the right */
 }
+
+/* Sidebar Navigation */
 .user-view__menu {
-  -webkit-box-flex: 32rem;
-  -ms-flex: 32rem 0 0px;
   flex: 32rem 0 0;
-  background-image: -webkit-gradient(
-    linear,
-    left top,
-    right bottom,
-    from(#7dd56f),
-    to(#28b487)
-  );
   background-image: linear-gradient(to right bottom, #7dd56f, #28b487);
   padding: 4rem 0;
 }
+
+/* Main Content */
 .user-view__content {
-  -webkit-box-flex: 1;
-  -ms-flex: 1;
   flex: 1;
-  padding: 7rem 0;
+  padding: 7rem 4rem;
 }
+
+/* 📌 Responsive: Stack Sidebar on Top for Small Screens */
+@media (max-width: 768px) {
+  .user-view {
+    flex-direction: column; /* Stack sidebar first, then content */
+  }
+
+  .user-view__menu {
+    width: 100%;
+    padding: 3rem;
+    text-align: center;
+  }
+
+  .side-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .side-nav li {
+    flex: 1;
+    text-align: center;
+    padding: 1rem;
+  }
+
+  /* Adjust Content Layout */
+  .user-view__content {
+    padding: 5rem 2rem;
+  }
+}
+
+/* Forms */
 .user-view__form-container {
   max-width: 68rem;
   margin: 0 auto;
-  padding: 0 8rem;
+  padding: 0 4rem;
 }
+
+/* Reduce Padding for Small Screens */
+@media (max-width: 500px) {
+  .user-view__content {
+    padding: 4rem 1.5rem;
+  }
+
+  .user-view__form-container {
+    padding: 0 1.5rem;
+  }
+}
+
+/* Form Inputs */
+.form__group {
+  margin-bottom: 2rem;
+}
+
+.form__input {
+  width: 100%;
+  font-size: 1.6rem;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* Reduce Font Size for Small Screens */
+@media (max-width: 500px) {
+  .form__input {
+    font-size: 1.4rem;
+    padding: 0.8rem;
+  }
+}
+
+/* Buttons */
+.btn {
+  font-size: 1.6rem;
+  padding: 1rem 2rem;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.btn--green {
+  background-color: #28b487;
+  color: white;
+}
+
+@media (max-width: 500px) {
+  .btn {
+    font-size: 1.4rem;
+    padding: 0.8rem 1.5rem;
+  }
+}
+
+/* Profile Picture Upload */
+.form__photo-upload {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.form__user-photo {
+  width: 5rem;
+  height: 5rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Reduce Image Size for Smaller Screens */
+@media (max-width: 500px) {
+  .form__user-photo {
+    width: 4rem;
+    height: 4rem;
+  }
+}
+
 
 .footer {
   background-color: #f7f7f7;

@@ -208,8 +208,10 @@ exports.getSignupPage = (req, res, next) => {
 };
 
 exports.getAccount = (req, res) => {
+  const pageClass = 'tour-page';
   res.status(200).render('account', {
     title: 'Your Account',
+    pageClass
   });
 };
 
