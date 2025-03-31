@@ -43,7 +43,7 @@ block content
                 tbody
                     each review in reviews
                         tr
-                            td= review.tour ? review.tour.name : 'Unknown Tour'
+                            td.name-column= review.tour ? review.tour.name : 'Unknown Tour'
                             td= review.user ? review.user.name : 'Unknown User'
                             td= review.rating
                             td= review.review

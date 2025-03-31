@@ -16,11 +16,12 @@ exports.alerts = (req, res, next) => {
 };
 
 exports.getOverview = catchAsync(async (req, res, next) => {
-  //1} Get tour data from collection
   const tours = await Tour.find();
+  const overviewClass = 'overview-page';
   res.status(200).render('overview', {
     title: 'All Tours',
     tours,
+    overviewClass
   });
 });
 
@@ -49,12 +50,15 @@ exports.getTour = catchAsync(async (req, res, next) => {
     );
     console.log('User has booked this tour:', hasBooked);
   }
+  // Define pageClass before passing it to res.render
+  const pageClass = 'tour-page';
 
   // 3. Render the page with hasBooked passed to the template
   res.status(200).render('tour', {
     title: `${tour.name} Tour`,
     tour,
-    hasBooked, // Boolean value used in the Pug template
+    hasBooked,
+    pageClass
   });
 });
 
@@ -73,13 +77,12 @@ exports.getManageTourPage = catchAsync(async (req, res, next) => {
 
   res.status(200).render('manageTours', {
     title: 'Tour Admin Page',
-    tour, // A single tour for editing
-    tours, // All tours for the table
+    tour,
+    tours,
   });
 });
 
 exports.getManageUserPage = catchAsync(async (req, res, next) => {
-  // Fetch all users for display
   const users = await User.find();
 
   // Fetch a single user if an ID is provided
@@ -95,8 +98,8 @@ exports.getManageUserPage = catchAsync(async (req, res, next) => {
   res.status(200).render('manageUsers', {
     title: 'User Admin Page',
     users,
-    user, // Pass single user for editing
-    loggedInUser: req.user, // Pass the logged-in user
+    user,
+    loggedInUser: req.user,
   });
 });
 
@@ -183,8 +186,10 @@ exports.leaveReviews = catchAsync(async (req, res, next) => {
 });
 
 exports.getLoginForm = (req, res) => {
+  const overviewClass = 'overview-page';
   res.status(200).render('login', {
     title: 'Log into your Account',
+    overviewClass
   });
 };
 
@@ -242,9 +247,13 @@ exports.getMyTours = catchAsync(async (req, res, next) => {
   const tourIDs = bookings.map((el) => el.tour);
   const tours = await Tour.find({ _id: { $in: tourIDs } });
 
+  // Define a class for the body if you want (optional)
+  const overviewClass = 'overview-page';
+
   res.status(200).render('overview', {
     title: 'My Tours',
     tours,
+    overviewClass,
   });
 });
 

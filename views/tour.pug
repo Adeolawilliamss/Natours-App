@@ -1,5 +1,6 @@
 extends base
-include  _reviewCard
+include _reviewCard
+
 
 mixin overviewBox(label, text, icon)
     .overview-box__detail
@@ -9,6 +10,7 @@ mixin overviewBox(label, text, icon)
         span.overview-box__text= text
 
 block content
+    - var pageClass = 'tour-page'; 
     section.section-header
         .header__hero
             .header__hero-overlay &nbsp;
@@ -20,7 +22,7 @@ block content
             .heading-box__group
                 .heading-box__detail
                     svg.heading-box__icon
-                        //- use(xlink:href='/img/icons.svg#icon-clock')
+                        use(xlink:href='/img/icons.svg#icon-clock')
                     span.heading-box__text= `${tour.duration} days`
                 .heading-box__detail
                     svg.heading-box__icon
@@ -63,9 +65,6 @@ block content
             .picture-box
                 img.picture-box__img(src=`/img/tours/${img}`, alt=`The Park Camper Tour 1 Tour ${i + 1}`,
                 class=`.picture-box__img--${i + 1}`)
-
-    section.section-map
-        #map(data-locations=JSON.stringify(tour.locations))
 
     section.section-reviews
         .review_background

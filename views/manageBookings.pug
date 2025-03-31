@@ -45,7 +45,7 @@ block content
                 tbody
                     each booking in bookings
                         tr
-                            td= booking.tour ? booking.tour.name : 'Unknown Tour'
+                            td.name-column= booking.tour ? booking.tour.name : 'Unknown Tour'
                             td= booking.user ? booking.user.name : 'Unknown User'
                             td= booking.price
                             td= booking.formattedStartDates

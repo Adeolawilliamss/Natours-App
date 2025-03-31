@@ -96,36 +96,6 @@ exports.createTour = catchAsync(async (req, res, next) => {
   });
 });
 
-// exports.createTour = catchAsync(async (req, res, next) => {
-//   if (req.body.startDates) {
-//     req.body.startDates = req.body.startDates.map((date) => {
-//       const participants =
-//         date.participants !== undefined ? date.participants : 1;
-//       let soldOut = date.soldOut !== undefined ? date.soldOut : false;
-
-//       // If participants reach maxGroupSize, mark as sold out
-//       if (req.body.maxGroupSize && participants >= req.body.maxGroupSize) {
-//         soldOut = true;
-//       }
-
-//       return {
-//         date: new Date(date.date || date),
-//         participants,
-//         soldOut,
-//       };
-//     });
-//   }
-
-//   const newTour = await Tour.create(req.body);
-
-//   res.status(201).json({
-//     status: 'success',
-//     data: {
-//       tour: newTour,
-//     },
-//   });
-// });
-
 exports.getAllTours = factory.getAll(Tour);
 
 exports.getTour = factory.getOne(Tour, { path: 'reviews' });
@@ -210,8 +180,7 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
     },
   });
 });
-// '/tours-within/:distance/center/:latlng/unit/:unit',
-// /tours-within/233/center/34.007142,-118.237244/unit/ml
+
 exports.getToursWithin = catchAsync(async (req, res, next) => {
   const { distance, latlng, unit } = req.params;
   const [lat, lng] = latlng.split(',');

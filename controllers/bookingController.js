@@ -77,9 +77,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 // });
 const createBookingCheckout = async (session) => {
   const tour = session.client_reference_id;
-  console.log(tour);
   const user = await User.findOne({ email: session.customer_email });
-  console.log(user);
 
   if (!user) {
     console.error('User not found:', session.customer_email);
@@ -102,7 +100,6 @@ const createBookingCheckout = async (session) => {
     tour: new mongoose.Types.ObjectId(tour),
     user: new mongoose.Types.ObjectId(user.id),
     price: parseFloat(price),
-    startDate: new Date(), // or a specific date if available
   });
 };
 

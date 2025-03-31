@@ -19,14 +19,12 @@ router.post(
 );
 
 // Get all bookings, with filtering by user or tour
-router
-  .route('/')
-  .get(bookingController.getAllBookings)
-  .post(
-    authController.protect,
-    authController.restrictTo('admin', 'user'),
-    bookingController.createBooking,
-  );
+router.route('/').get(bookingController.getAllBookings);
+// .post(
+//   authController.protect,
+//   authController.restrictTo('admin', 'user'),
+//   bookingController.createBooking,
+// );
 
 router.patch('/updateBooking/:id', bookingController.updateBooking);
 
