@@ -13,7 +13,8 @@ block content
     - var pageClass = 'tour-page'; 
     section.section-header
         .header__hero
-            .header__hero-overlay &nbsp;
+           - var overlayClass = tour.difficulty === 'easy' ? 'overlay--green' : tour.difficulty === 'medium' ? 'overlay--red' : 'overlay--dark';
+            .header__hero-overlay(class=overlayClass)
             img.header__hero-img(src=`/img/tours/${tour.imageCover}`, alt=`${tour.name}`)
 
         .heading-box
@@ -66,7 +67,8 @@ block content
                 img.picture-box__img(src=`/img/tours/${img}`, alt=`The Park Camper Tour 1 Tour ${i + 1}`,
                 class=`.picture-box__img--${i + 1}`)
 
-    section.section-reviews
+    - var reviewClass = tour.difficulty === 'easy' ? 'overlay--green' : tour.difficulty === 'medium' ? 'overlay--red' : 'overlay--dark';
+    section.section-reviews(class=reviewClass)
         .review_background
             a(href=`/tour/${tour.slug}/LeaveReviews`) Click here to leave a review...
         .reviews

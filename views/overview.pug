@@ -9,8 +9,10 @@ block content
                     .card
                         .card__header
                             .card__picture
-                                .card__picture-overlay &nbsp;
+                                - var difficultyClass = tour.difficulty === 'easy' ? 'overlay--green' : tour.difficulty === 'medium' ? 'overlay--red' : 'overlay--dark';
+                                .card__picture-overlay(class=difficultyClass)
                                 img.card__picture-img(src=`/img/tours/${tour.imageCover}`, alt=`${tour.name}`)
+
                             h3.heading-tertirary
                                 span= tour.name
                         .card__details

@@ -193,10 +193,9 @@ body {
   .heading-primary span {
     font-size: 12px;
     margin: auto;
-    white-space: nowrap; 
+    white-space: nowrap;
   }
 }
-
 
 .heading-tertirary {
   font-size: 2.75rem;
@@ -388,14 +387,6 @@ body {
   position: absolute;
   width: 100%;
   height: 100%;
-  background-image: -webkit-gradient(
-    linear,
-    left top,
-    right bottom,
-    from(#7dd56f),
-    to(#28b487)
-  );
-  background-image: linear-gradient(to right bottom, #7dd56f, #28b487);
   opacity: 0.85;
 }
 
@@ -682,7 +673,6 @@ body {
   }
 }
 
-
 .section-pictures {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -741,14 +731,6 @@ body {
   padding: calc(5rem + var(--section-rotate)) 0;
   position: relative;
   z-index: 1000;
-  background: -webkit-gradient(
-    linear,
-    left top,
-    right bottom,
-    from(#7dd56f),
-    to(#28b487)
-  );
-  background: linear-gradient(to right bottom, #7dd56f, #28b487);
   clip-path: polygon(
     0 var(--section-rotate),
     100% 0,
@@ -1109,7 +1091,6 @@ body {
   }
 }
 
-
 .footer {
   background-color: #f7f7f7;
   padding: 6rem 4rem 3rem 4rem;
@@ -1315,9 +1296,6 @@ body {
   }
 }
 
-
-
-
 .nav__search {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -1442,8 +1420,6 @@ body {
   border-bottom: 1px solid currentColor;
 }
 
-
-
 /* Card Styles */
 .card-container {
   max-width: 120rem;
@@ -1492,8 +1468,19 @@ body {
   position: absolute;
   width: 100%;
   height: 100%;
-  background-image: linear-gradient(to right bottom, #7dd56f, #28b487);
   opacity: 0.7;
+}
+
+.overlay--green {
+  background-image: linear-gradient(to right bottom, #7dd56f, #28b487);
+}
+
+.overlay--red {
+  background-image: linear-gradient(to right bottom, #f56060, #c0392b);
+}
+
+.overlay--dark {
+  background-image: linear-gradient(to right bottom, #2f2f2f, #1a1a1a);
 }
 
 .card__picture-img {
@@ -1619,10 +1606,6 @@ body {
   color: #777;
   margin-top: 3rem;
 }
-
-
-
-
 
 .error {
   position: absolute;
@@ -1897,7 +1880,6 @@ body {
   transform: translateY(-2px);
 }
 
-
 /* Reviews Container */
 .reviews-container {
   display: flex;
@@ -1994,7 +1976,7 @@ p.no-tour {
 
 .review_background a {
   color: black;
-  font-size:1.7rem;
+  font-size: 1.7rem;
   font-weight: bold;
 }
 
@@ -2034,7 +2016,9 @@ p.no-tour {
 }
 
 /* Inputs and Selects */
-input, select, textarea {
+input,
+select,
+textarea {
   padding: 0.7rem;
   font-size: 1.5rem;
   border: 1px solid #ccc;
@@ -2098,7 +2082,9 @@ textarea {
     font-size: 1.3rem;
   }
 
-  input, select, textarea {
+  input,
+  select,
+  textarea {
     font-size: 1.3rem;
     padding: 0.5rem;
   }
@@ -2113,7 +2099,6 @@ textarea {
     font-size: 1.3rem;
   }
 }
-
 
 .admin-container {
   max-width: 1200px;
@@ -2162,11 +2147,11 @@ textarea {
 .admin-container input,
 textarea,
 select {
-    padding: 7px;
-    font-size: 12px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    width: 100%;
+  padding: 7px;
+  font-size: 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 100%;
 }
 
 .admin-container textarea {
@@ -2177,43 +2162,43 @@ select {
 .admin-btn,
 .edit-btn,
 .delete-btn {
-    padding: 8px 10px;
-    font-size: 13px;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: 0.3s ease;
+  padding: 8px 10px;
+  font-size: 13px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: 0.3s ease;
 }
 
 /* Save / Submit Button */
 .admin-btn {
-    background: #007bff;
-    color: white;
+  background: #007bff;
+  color: white;
 }
 
 .admin-btn:hover {
-    background: #0056b3;
+  background: #0056b3;
 }
 
 /* Edit Button */
 .edit-btn {
-    background: #ffc107;
-    color: black;
-    margin-right: 5px;
+  background: #ffc107;
+  color: black;
+  margin-right: 5px;
 }
 
 .edit-btn:hover {
-    background: #e0a800;
+  background: #e0a800;
 }
 
 /* Delete Button */
 .delete-btn {
-    background: #dc3545;
-    color: white;
+  background: #dc3545;
+  color: white;
 }
 
 .delete-btn:hover {
-    background: #c82333;
+  background: #c82333;
 }
 
 /* Make the table responsive */
@@ -2237,7 +2222,8 @@ thead {
   color: white;
 }
 
-th, td {
+th,
+td {
   padding: 12px;
   border: 1px solid #ddd;
   text-align: left;
@@ -2260,11 +2246,16 @@ tbody tr:nth-child(even) {
 
 /* Responsive Table - Stack rows on small screens */
 @media (max-width: 600px) {
-  table, thead, tbody, th, td, tr {
+  table,
+  thead,
+  tbody,
+  th,
+  td,
+  tr {
     display: block;
     font-size: 15px;
   }
-  
+
   thead {
     display: none; /* Hide table header */
   }
@@ -2290,23 +2281,29 @@ tbody tr:nth-child(even) {
 }
 
 /* Reduce Font Size of Inputs */
-input, select, textarea {
+input,
+select,
+textarea {
   font-size: 1.5rem;
   padding: 1rem;
   border: 1px solid #ccc;
   border-radius: 5px;
 }
 
-input[type="text"], input[type="number"], select, textarea {
+input[type='text'],
+input[type='number'],
+select,
+textarea {
   height: 35px;
 }
 
 @media (max-width: 500px) {
-  input, select, textarea {
+  input,
+  select,
+  textarea {
     font-size: 1rem;
   }
 }
-
 
 /* Responsive Popup */
 .popup {
@@ -2345,7 +2342,7 @@ input[type="text"], input[type="number"], select, textarea {
   margin-top: 10px;
   margin-left: 4px;
   background: red;
-  color: white; 
+  color: white;
   padding: 12px 35px;
   border: none;
   cursor: pointer;
